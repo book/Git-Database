@@ -34,6 +34,11 @@ sub get_object {
     # TODO - return a object when it exists
 }
 
+sub DEMOLISH {
+    my ($self) = @_;
+    $self->_object_factory->close if $self->_has_object_factory;
+}
+
 1;
 
 __END__
