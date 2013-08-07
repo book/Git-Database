@@ -5,6 +5,8 @@ use Test::Git;
 
 use Git::Simple;
 
+has_git();
+
 my $t = test_repository();
 my $r = Git::Simple->new( work_tree => $t->work_tree );
 
