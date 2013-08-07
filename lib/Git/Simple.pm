@@ -26,10 +26,10 @@ sub get_object {
     my $out = $factory->stdout;
     local $/ = "\012";
     chomp( my $reply = <$out> );
-    my ( $sha1, $type, $size ) = split / /, $reply;
+    my ( $sha1, $kind, $size ) = split / /, $reply;
 
     # object does not exist in the git object database
-    return if $type eq 'missing';
+    return if $kind eq 'missing';
 
     # TODO - return a object when it exists
 }
