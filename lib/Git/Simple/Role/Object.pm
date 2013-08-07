@@ -34,6 +34,8 @@ sub _build_digest {
         '--stdin', '-w', { input => $self->content } );
 }
 
+sub as_string { $_[0]->content; }
+
 1;
 
 __END__

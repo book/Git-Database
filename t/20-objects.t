@@ -35,8 +35,9 @@ for my $digest ( $miss, $SHA1, $sha1 ) {
 # create a blob
 my $blob = Git::Simple::Blob->new( repository => $r, content => 'hello' );
 isa_ok( $blob, 'Git::Simple::Blob' );
-is( $blob->size,    5,       'size' );
-is( $blob->content, 'hello', 'content' );
+is( $blob->size,      5,       'size' );
+is( $blob->content,   'hello', 'content' );
+is( $blob->as_string, 'hello', 'content' );
 
 # so long as we don't request its digest, it's not saved
 ok( !$r->has_object($SHA1), "$SHA1 not saved yet" );
@@ -64,8 +65,9 @@ is_deeply(
 # fetch the object back from the git database
 $blob = $r->get_object($sha1);
 isa_ok( $blob, 'Git::Simple::Blob' );
-is( $blob->size,    5,       'size' );
-is( $blob->digest,  $SHA1,   'digest' );
-is( $blob->content, 'hello', 'content' );
+is( $blob->size,      5,       'size' );
+is( $blob->digest,    $SHA1,   'digest' );
+is( $blob->content,   'hello', 'content' );
+is( $blob->as_string, 'hello', 'content' );
 
 done_testing;
