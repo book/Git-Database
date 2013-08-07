@@ -2,6 +2,7 @@ package Git::Simple;
 
 use Moo;
 use Sub::Quote;
+
 extends 'Git::Repository';
 
 has _object_factory => (
@@ -14,6 +15,11 @@ has _object_factory => (
 );
 
 sub _build__object_factory { $_[0]->command( 'cat-file', '--batch' ); }
+
+use Git::Simple::Blob;
+my %kind2class = (
+    blob => 'Git::Simple::Blob',
+);
 
 sub get_object {
     my ( $self, $digest ) = @_;
@@ -31,7 +37,28 @@ sub get_object {
     # object does not exist in the git object database
     return if $kind eq 'missing';
 
-    # TODO - return a object when it exists
+    # TODO - return an object when it exists
+    my $res = read $out, (my $content), $size;
+    if( $res != $size ) {
+         $factory->close; # in case the exception is trapped
+         die "Read $res/$size of content from git";
+    }
+
+    # read the last byte
+    $res = read $out, (my $junk), 1;
+    if( $res != 1 ) {
+         $factory->close; # in case the exception is trapped
+         die "Unable to finish reading content from git";
+    }
+
+    # careful with utf-8!
+    # create a new object with digets, content and size
+    return $kind2class{$kind}->new(
+        repository => $self,
+        size       => $size,
+        content    => $content,
+        digest     => $sha1
+    );
 }
 
 sub DEMOLISH {
