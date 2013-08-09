@@ -1,4 +1,4 @@
-package Git::Simple;
+package Git::Database;
 
 use Moo;
 use Sub::Quote;
@@ -27,9 +27,9 @@ has _object_checker => (
 
 sub _build__object_checker { $_[0]->command( 'cat-file', '--batch-check' ); }
 
-use Git::Simple::Blob;
+use Git::Database::Blob;
 my %kind2class = (
-    blob => 'Git::Simple::Blob',
+    blob => 'Git::Database::Blob',
 );
 
 sub get_object {

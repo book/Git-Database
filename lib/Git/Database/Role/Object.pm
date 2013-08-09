@@ -1,4 +1,4 @@
-package Git::Simple::Role::Object;
+package Git::Database::Role::Object;
 
 use Moo::Role;
 use Sub::Quote;
@@ -46,11 +46,11 @@ __END__
 
 =head1 SYNOPSIS
 
-    package Git::Simple::Blob;
+    package Git::Database::Blob;
 
     use Moo;
 
-    with 'Git::Simple::Role::Object';
+    with 'Git::Database::Role::Object';
 
     sub kind { 'blob' }
 
@@ -58,15 +58,15 @@ __END__
 
 =head1 DESCRIPTION
 
-Git::Simple::Role::Object provides the generic behaviour for all
-L<Git::Simple> objects obtained from or stored into the git object
+Git::Database::Role::Object provides the generic behaviour for all
+L<Git::Database> objects obtained from or stored into the git object
 database.
 
 =head1 ATTRIBUTES
 
 =head2 repository
 
-The L<Git::Simple> repository from which the object comes from
+The L<Git::Database> repository from which the object comes from
 (or will be stored into).
 
 =head2 content
@@ -100,7 +100,7 @@ In Git, this is one of C<blob>, C<tree>, C<commit>, and C<tag>.
 
 =head1 SEE ALSO
 
-L<Git::Simple::Blob>
+L<Git::Database::Blob>
 
 =head1 COPYRIGHT
 

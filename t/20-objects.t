@@ -3,12 +3,12 @@ use warnings;
 use Test::More;
 use Test::Git;
 
-use Git::Simple;
+use Git::Database;
 
 has_git();
 
 my $t = test_repository();
-my $r = Git::Simple->new( work_tree => $t->work_tree );
+my $r = Git::Database->new( work_tree => $t->work_tree );
 
 # some digests
 my $miss = '123456';
@@ -33,8 +33,8 @@ for my $digest ( $miss, $SHA1, $sha1 ) {
 }
 
 # create a blob
-my $blob = Git::Simple::Blob->new( repository => $r, content => 'hello' );
-isa_ok( $blob, 'Git::Simple::Blob' );
+my $blob = Git::Database::Blob->new( repository => $r, content => 'hello' );
+isa_ok( $blob, 'Git::Database::Blob' );
 is( $blob->size,      5,       'size' );
 is( $blob->content,   'hello', 'content' );
 is( $blob->as_string, 'hello', 'content' );
@@ -64,7 +64,7 @@ is_deeply(
 
 # fetch the object back from the git database
 $blob = $r->get_object($sha1);
-isa_ok( $blob, 'Git::Simple::Blob' );
+isa_ok( $blob, 'Git::Database::Blob' );
 is( $blob->size,      5,       'size' );
 is( $blob->digest,    $SHA1,   'digest' );
 is( $blob->content,   'hello', 'content' );
