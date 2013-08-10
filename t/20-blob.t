@@ -33,7 +33,7 @@ for my $test ( @{ $objects{blob} } ) {
     is( $r->get_object($digest), undef, "get_object( $digest ): missing" );
 
     # this test computes the digest
-    my $blob = Git::Database::Blob->new(
+    my $blob = Git::Database::Object::Blob->new(
         content    => $test->{content},
         repository => $r
     );

@@ -1,4 +1,4 @@
-package Git::Database::Tree;
+package Git::Database::Object::Tree;
 
 use Moo;
 

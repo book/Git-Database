@@ -22,7 +22,7 @@ for my $test ( @{ $objects{tree} } ) {
         diag "$test->{desc} with $args->[0]";
 
         # create from scratch
-        my $tree = Git::Database::Tree->new(@$args, repository => $r);
+        my $tree = Git::Database::Object::Tree->new(@$args, repository => $r);
         test_tree( $tree, $test );
 
         # obtain from the git object database

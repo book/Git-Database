@@ -1,4 +1,4 @@
-package Git::Database::Blob;
+package Git::Database::Object::Blob;
 
 use Moo;
 

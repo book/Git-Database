@@ -27,11 +27,11 @@ has _object_checker => (
 
 sub _build__object_checker { $_[0]->command( 'cat-file', '--batch-check' ); }
 
-use Git::Database::Blob;
-use Git::Database::Tree;
+use Git::Database::Object::Blob;
+use Git::Database::Object::Tree;
 my %kind2class = (
-    blob => 'Git::Database::Blob',
-    tree => 'Git::Database::Tree',
+    blob => 'Git::Database::Object::Blob',
+    tree => 'Git::Database::Object::Tree',
 );
 
 sub get_object {

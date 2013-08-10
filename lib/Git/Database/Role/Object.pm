@@ -47,7 +47,7 @@ __END__
 
 =head1 SYNOPSIS
 
-    package Git::Database::Blob;
+    package Git::Database::Object::Blob;
 
     use Moo;
 
@@ -109,7 +109,8 @@ In Git, this is one of C<blob>, C<tree>, C<commit>, and C<tag>.
 
 =head1 SEE ALSO
 
-L<Git::Database::Blob>
+L<Git::Database::Object::Blob>,
+L<Git::Database::Object::Tree>.
 
 =head1 COPYRIGHT
 

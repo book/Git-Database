@@ -73,7 +73,7 @@ sub test_blob {
     my ( $blob, $test ) = @_;
 
     # read content in memory early
-    isa_ok( $blob, 'Git::Database::Blob' );
+    isa_ok( $blob, 'Git::Database::Object::Blob' );
     is( $blob->kind,      $test->{kind},    'kind' );
     is( $blob->content,   $test->{content}, 'content' );
     is( $blob->size,      $test->{size},    'size' );
@@ -84,7 +84,7 @@ sub test_blob {
 sub test_tree {
     my ( $tree, $test ) = @_;
 
-    isa_ok( $tree, 'Git::Database::Tree' );
+    isa_ok( $tree, 'Git::Database::Object::Tree' );
     is( $tree->kind,    $test->{kind},    'kind' );
     is( $tree->content, $test->{content}, 'content' );
     is( $tree->size,    $test->{size},    'size' );
