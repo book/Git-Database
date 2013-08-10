@@ -180,6 +180,34 @@ COMMIT
             digest => '9d94853f1733007321288974bce2cec5bb07a6df',
         },
     ],
+    tag => [
+        {   desc     => 'world tag',
+            tag_info => {
+                object => 'ef25e81ba86b7df16956c974c8a9c1ff2eca1326',
+                type   => 'commit',
+                tag    => 'world',
+                tagger => Git::Database::Actor->new(
+                    name  => 'Philippe Bruhat (BooK)',
+                    email => 'book@cpan.org'
+                ),
+                tagged_time => DateTime->from_epoch(
+                    epoch     => 1352846959,
+                    time_zone => '+0100'
+                ),
+                comment  => 'bonjour',
+                encoding => 'utf-8',
+            },
+            content => << 'TAG',
+object ef25e81ba86b7df16956c974c8a9c1ff2eca1326
+type commit
+tag world
+tagger Philippe Bruhat (BooK) <book@cpan.org> 1352846959 +0100
+
+bonjour
+TAG
+            digest => 'f5c10c1a841419d3b1db0c3e0c42b554f9e1eeb2',
+        }
+    ],
 );
 
 # add extra information
@@ -251,6 +279,30 @@ sub test_commit {
         'commit_info parents_digest'
     );
     is( $commit->as_string, $test->{string}, 'as_string' );
+}
+
+sub test_tag {
+    my ( $tag, $test ) = @_;
+
+    isa_ok( $tag, 'Git::Database::Object::Tag' );
+    is( $tag->kind,    $test->{kind},    'kind' );
+    is( $tag->content, $test->{content}, 'content' );
+    is( $tag->size,    $test->{size},    'size' );
+    is( $tag->digest,  $test->{digest},  'digest' );
+
+    # can't use is_deeply here
+    my $tag_info = $tag->tag_info;
+    for my $attr (qw( object type tag tagged_time comment )) {
+        is( $tag_info->{$attr},
+            $test->{tag_info}{$attr},
+            "commit_info $attr"
+        );
+    }
+    is( $tag_info->{tagger}->ident,
+        $test->{tag_info}{tagger}->ident,
+        "commit_info tagger"
+    );
+    is( $tag->as_string, $test->{string}, 'as_string' );
 }
 
 1;
