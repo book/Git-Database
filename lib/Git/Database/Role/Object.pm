@@ -24,6 +24,7 @@ has size => (
 
 has content => (
     is => 'lazy',
+    predicate => 1,
 );
 
 # to compute the digest of a new object, save it in the object database

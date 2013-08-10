@@ -70,4 +70,23 @@ is( $blob->digest,    $SHA1,   'digest' );
 is( $blob->content,   'hello', 'content' );
 is( $blob->as_string, 'hello', 'content' );
 
+# now create a tree object
+my $tree
+    = Git::Database::Tree->new( repository => $r, directory_entries => [] );
+is( $tree->content,   '', 'empty tree: content' );
+is( $tree->as_string, '', 'empty tree: as_string' );
+
+# tree with a single file
+$tree = Git::Database::Tree->new(
+    repository        => $r,
+    directory_entries => [
+        Git::Database::DirectoryEntry->new(
+            filename => 'hello',
+            mode     => '100644',
+            digest   => $SHA1
+        ),
+    ]
+);
+is( $tree->as_string, "100644 blob $SHA1\thello\012" );
+
 done_testing;
