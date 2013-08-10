@@ -2,6 +2,7 @@ use strict;
 use warnings;
 use DateTime;
 
+use Git::Database::Actor;
 use Git::Database::DirectoryEntry;
 
 # test data
@@ -75,6 +76,110 @@ our %objects = (
             digest => '71ff52fcd190c0a900fffad2ecf2f678554602b6',
         },
     ],
+    commit => [
+        {   desc        => 'hello commit',
+            commit_info => {
+                tree_digest => 'b52168be5ea341e918a9cbbb76012375170a439f',
+                author      => Git::Database::Actor->new(
+                    name  => 'Philippe Bruhat (BooK)',
+                    email => 'book@cpan.org'
+                ),
+                authored_time => DateTime->from_epoch(
+                    epoch     => 1352762713,
+                    time_zone => '+0100'
+                ),
+                committer => Git::Database::Actor->new(
+                    name  => 'Philippe Bruhat (BooK)',
+                    email => 'book@cpan.org'
+                ),
+                committed_time => DateTime->from_epoch(
+                    epoch     => 1352764647,
+                    time_zone => '+0100'
+                ),
+                comment  => 'hello',
+                encoding => 'utf-8',
+            },
+            content => << 'COMMIT',
+tree b52168be5ea341e918a9cbbb76012375170a439f
+author Philippe Bruhat (BooK) <book@cpan.org> 1352762713 +0100
+committer Philippe Bruhat (BooK) <book@cpan.org> 1352764647 +0100
+
+hello
+COMMIT
+            digest => 'ef25e81ba86b7df16956c974c8a9c1ff2eca1326',
+        },
+        {   desc        => 'commit with a parent',
+            commit_info => {
+                tree_digest => '71ff52fcd190c0a900fffad2ecf2f678554602b6',
+                parents_digest =>
+                    ['ef25e81ba86b7df16956c974c8a9c1ff2eca1326'],
+                author => Git::Database::Actor->new(
+                    name  => 'Philippe Bruhat (BooK)',
+                    email => 'book@cpan.org'
+                ),
+                authored_time => DateTime->from_epoch(
+                    epoch     => 1352766313,
+                    time_zone => '+0100'
+                ),
+                committer => Git::Database::Actor->new(
+                    name  => 'Philippe Bruhat (BooK)',
+                    email => 'book@cpan.org'
+                ),
+                committed_time => DateTime->from_epoch(
+                    epoch     => 1352766360,
+                    time_zone => '+0100'
+                ),
+                comment  => 'say hi to parent!',
+                encoding => 'utf-8',
+            },
+            content => << 'COMMIT',
+tree 71ff52fcd190c0a900fffad2ecf2f678554602b6
+parent ef25e81ba86b7df16956c974c8a9c1ff2eca1326
+author Philippe Bruhat (BooK) <book@cpan.org> 1352766313 +0100
+committer Philippe Bruhat (BooK) <book@cpan.org> 1352766360 +0100
+
+say hi to parent!
+COMMIT
+            digest => '3a4098405fa5a807b2306e345dda70d33d229c91',
+        },
+        {   desc        => 'a merge',
+            commit_info => {
+                tree_digest    => '71ff52fcd190c0a900fffad2ecf2f678554602b6',
+                parents_digest => [
+                    '3a4098405fa5a807b2306e345dda70d33d229c91',
+                    'ef25e81ba86b7df16956c974c8a9c1ff2eca1326',
+                ],
+                author => Git::Database::Actor->new(
+                    name  => 'Philippe Bruhat (BooK)',
+                    email => 'book@cpan.org'
+                ),
+                authored_time => DateTime->from_epoch(
+                    epoch     => 1358247404,
+                    time_zone => '+0100'
+                ),
+                committer => Git::Database::Actor->new(
+                    name  => 'Philippe Bruhat (BooK)',
+                    email => 'book@cpan.org'
+                ),
+                committed_time => DateTime->from_epoch(
+                    epoch     => 1358247404,
+                    time_zone => '+0100'
+                ),
+                comment  => 'a merge',
+                encoding => 'utf-8',
+            },
+            content => << 'COMMIT',
+tree 71ff52fcd190c0a900fffad2ecf2f678554602b6
+parent 3a4098405fa5a807b2306e345dda70d33d229c91
+parent ef25e81ba86b7df16956c974c8a9c1ff2eca1326
+author Philippe Bruhat (BooK) <book@cpan.org> 1358247404 +0100
+committer Philippe Bruhat (BooK) <book@cpan.org> 1358247404 +0100
+
+a merge
+COMMIT
+            digest => '9d94853f1733007321288974bce2cec5bb07a6df',
+        },
+    ],
 );
 
 # add extra information
@@ -116,6 +221,36 @@ sub test_tree {
         'directory_entries'
     );
     is( $tree->as_string, $test->{string}, 'as_string' );
+}
+
+sub test_commit {
+    my ( $commit, $test ) = @_;
+
+    isa_ok( $commit, 'Git::Database::Object::Commit' );
+    is( $commit->kind,    $test->{kind},    'kind' );
+    is( $commit->content, $test->{content}, 'content' );
+    is( $commit->size,    $test->{size},    'size' );
+    is( $commit->digest,  $test->{digest},  'digest' );
+
+    # can't use is_deeply here
+    my $commit_info = $commit->commit_info;
+    for my $attr (qw( tree_digest authored_time committed_time comment )) {
+        is( $commit_info->{$attr},
+            $test->{commit_info}{$attr},
+            "commit_info $attr"
+        );
+    }
+    for my $attr (qw( author committer )) {
+        is( $commit_info->{$attr}->ident,
+            $test->{commit_info}{$attr}->ident,
+            "commit_info $attr"
+        );
+    }
+    is( join( ' ', @{ $commit_info->{parents_digest} } ),
+        join( ' ', @{ $test->{commit_info}{parents_digest} || [] } ),
+        'commit_info parents_digest'
+    );
+    is( $commit->as_string, $test->{string}, 'as_string' );
 }
 
 1;
