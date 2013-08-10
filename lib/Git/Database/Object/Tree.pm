@@ -9,10 +9,11 @@ use Git::Database::DirectoryEntry;
 sub kind {'tree'}
 
 has directory_entries => (
-    is => 'lazy',
-    required    => 0,
-    predicate   => 1,
-    builder     => '_build_directory_entries',
+    is        => 'rwp',
+    required  => 0,
+    predicate => 1,
+    lazy      => 1,
+    builder   => 1,
 );
 
 # ensure at least one but not both content or directory_entries is defined
@@ -22,6 +23,13 @@ sub BUILD {
         if !$self->has_content && !$self->has_directory_entries;
     die "At most one of 'content' and 'directory_entries' can be defined"
         if $self->has_content && $self->has_directory_entries;
+
+    # sort directory entries
+    $self->_set_directory_entries(
+        [   sort { $a->filename cmp $b->filename }
+                @{ $self->directory_entries }
+        ]
+    ) if $self->has_directory_entries;
 }
 
 # assumes directory_entries is set

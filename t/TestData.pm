@@ -55,7 +55,26 @@ our %objects = (
                 "100644 blob b6fc4c620b67d95f953a5c1c1230aaab5db5a1b0\thello\n040000 tree b52168be5ea341e918a9cbbb76012375170a439f\tsubdir\n",
             digest => '71ff52fcd190c0a900fffad2ecf2f678554602b6',
         },
-    ]
+        {   desc => 'tree with subtree (unsorted directory_entries)',
+            directory_entries => [
+                Git::Database::DirectoryEntry->new(
+                    mode     => '40000',
+                    filename => 'subdir',
+                    digest   => 'b52168be5ea341e918a9cbbb76012375170a439f'
+                ),
+                Git::Database::DirectoryEntry->new(
+                    mode     => '100644',
+                    filename => 'hello',
+                    digest   => 'b6fc4c620b67d95f953a5c1c1230aaab5db5a1b0'
+                ),
+            ],
+            content =>
+                "100644 hello\0\266\374Lb\13g\331_\225:\\\34\0220\252\253]\265\241\26040000 subdir\0\265!h\276^\243A\351\30\251\313\273v\1#u\27\nC\237",
+            string =>
+                "100644 blob b6fc4c620b67d95f953a5c1c1230aaab5db5a1b0\thello\n040000 tree b52168be5ea341e918a9cbbb76012375170a439f\tsubdir\n",
+            digest => '71ff52fcd190c0a900fffad2ecf2f678554602b6',
+        },
+    ],
 );
 
 # add extra information
