@@ -63,6 +63,14 @@ Git::Database::Role::Object provides the generic behaviour for all
 L<Git::Database> objects obtained from or stored into the git object
 database.
 
+When creating a new object meant to be added to the Git object database,
+only the C<content> attribute is actually required. L<Git::Database>
+is really the only module that will set all attributes, when it actually
+fetches the object data from the Git object database.
+
+Creating a new object with inconsistent C<kind>, C<size>, C<content>
+and C<digest> attributes can only end in tears.
+
 =head1 ATTRIBUTES
 
 =head2 repository
