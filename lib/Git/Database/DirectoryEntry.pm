@@ -43,4 +43,11 @@ sub as_string {
         $self->digest, $self->filename;
 }
 
+# some helper methods
+sub is_tree       { !( oct( '0' . $_[0]->mode ) & 0100000 ) }
+sub is_blob       { !!( oct( '0' . $_[0]->mode ) & 0100000 ) }
+sub is_executable { !!( oct( '0' . $_[0]->mode ) & 0100 ) }
+sub is_link       { $_[0]->mode eq '120000' }
+sub is_submodule  { $_[0]->mode eq '160000' }
+
 1;
