@@ -32,4 +32,26 @@ for my $test ( @{ $objects{commit} } ) {
     }
 }
 
+# some error cases
+my $test = $objects{commit}[0];
+my @fail = (
+    [   [   content     => $test->{content},
+            commit_info => $test->{commit_info},
+            repository  => $r,
+        ],
+        qr/^At most one of 'content' and 'commit_info' can be defined/,
+        'content + commit_info',
+    ],
+    [   [ repository => $r ],
+        qr/^At least one of 'content' or 'commit_info' must be defined/,
+        'no content, no commit_info',
+    ],
+);
+
+for my $fail (@fail) {
+    my ( $args, $re, $mesg ) = @$fail;
+    ok( !eval { Git::Database::Object::Commit->new(@$args) }, $mesg );
+    like( $@, $re, '... expected error message' );
+}
+
 done_testing;
