@@ -84,7 +84,6 @@ sub _build_commit_info {
     my @lines = split "\n", $self->content;
     my %header;
     while ( my $line = shift @lines ) {
-        last unless $line;
         my ( $key, $value ) = split ' ', $line, 2;
         push @{ $header{$key} }, $value;
     }
