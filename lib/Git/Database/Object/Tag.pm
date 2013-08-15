@@ -38,7 +38,6 @@ sub _build_tag_info {
     my $tag_info = {};
     my @lines    = split "\n", $self->content;
     while ( my $line = shift @lines ) {
-        last unless $line;
         my ( $key, $value ) = split ' ', $line, 2;
 
         if ( $key eq 'tagger' ) {
