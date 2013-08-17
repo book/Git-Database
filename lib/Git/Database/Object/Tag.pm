@@ -31,8 +31,6 @@ for my $attr (
     *$attr = sub { $_[0]->tag_info->{$attr} };
 }
 
-my %method_map = ( 'tagger' => 'tagged_time' );
-
 sub _build_tag_info {
     my $self     = shift;
     my $tag_info = {};
@@ -43,17 +41,17 @@ sub _build_tag_info {
         if ( $key eq 'tagger' ) {
             my @data = split ' ', $value;
             my ( $email, $epoch, $tz ) = splice( @data, -3 );
-            $tag_info->{$key} = Git::Database::Actor->new(
+            $tag_info->{tagger} = Git::Database::Actor->new(
                 name => join( ' ', @data ),
                 email => substr( $email, 1, -1 )
             );
-            $tag_info->{ $method_map{$key} } = DateTime->from_epoch(
+            $tag_info->{tagged_time} = DateTime->from_epoch(
                 epoch     => $epoch,
                 time_zone => $tz
             );
         }
         else {
-            $tag_info->{ $method_map{$key} || $key } = $value;
+            $tag_info->{$key} = $value;
         }
     }
     $tag_info->{comment} = join "\n", @lines;
