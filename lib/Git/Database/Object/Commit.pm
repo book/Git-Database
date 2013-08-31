@@ -161,8 +161,8 @@ The size (in bytes) of the object content.
 
 =head2 commit_info
 
-A hash containing the all the attributes listed below, as values
-for the keys with the same names.
+A hash reference containing the all the attributes listed below, as
+values for the keys with the same names.
 
 =head2 tree_digest
 
@@ -210,8 +210,8 @@ Create a new Git::Object::Database::Commit object.
 One (and only one) of the C<content> or C<commit_info> arguments is
 required.
 
-C<commit_info> is a hash containing the keys listed above, i.e.
-C<tree_digest>, C<author>, C<authored_time>, C<committer>,
+C<commit_info> is a reference to a hash containing the keys listed
+above, i.e. C<tree_digest>, C<author>, C<authored_time>, C<committer>,
 C<committed_time>, C<comment>, and C<encoding> (optional).
 
 =head1 SEE ALSO
