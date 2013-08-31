@@ -110,7 +110,9 @@ In Git, this is one of C<blob>, C<tree>, C<commit>, and C<tag>.
 =head1 SEE ALSO
 
 L<Git::Database::Object::Blob>,
-L<Git::Database::Object::Tree>.
+L<Git::Database::Object::Tree>,
+L<Git::Database::Object::Commit>,
+L<Git::Database::Object::Tag>.
 
 =head1 COPYRIGHT
 
