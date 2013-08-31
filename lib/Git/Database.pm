@@ -54,7 +54,7 @@ sub get_object {
     # object does not exist in the git object database
     return if $kind eq 'missing';
 
-    # TODO - return an object when it exists
+    # read the whole content in memory at once
     my $res = read $out, (my $content), $size;
     if( $res != $size ) {
          $factory->close; # in case the exception is trapped
