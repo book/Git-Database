@@ -12,12 +12,12 @@ use Sub::Quote;
 #
 # See also: cache.h in git.git
 has mode => (
-    is => 'ro',
+    is       => 'ro',
     required => 1,
 );
 
 has filename => (
-    is  => 'ro',
+    is => 'ro',
 );
 
 has digest => (
