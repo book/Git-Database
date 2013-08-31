@@ -68,3 +68,78 @@ sub as_string {
 }
 
 1;
+
+# ABSTRACT: A tree object in the Git object database
+
+=for Pod::Coverage::TrustPod BUILD
+
+=head1 SYNOPSIS
+
+    my $r    = Git::Database->new();        # current Git repository
+    my $tree = $r->get_object('b52168');    # abbreviated digest
+
+    # attributes
+    $tree->kind;      # tree
+    $tree->digest;    # b52168be5ea341e918a9cbbb76012375170a439f
+    ...;              # etc., see below
+
+=head1 DESCRIPTION
+
+Git::Database::Object::Tree represents a C<tree> object
+obtained via L<Git::Database> from a Git object database.
+
+=head1 ATTRIBUTES
+
+=head2 kind
+
+The object kind: C<tree>.
+
+=head2 digest
+
+The SHA-1 digest of the tree object.
+
+=head2 content
+
+The object's actual content.
+
+=head2 size
+
+The size (in bytes) of the object content.
+
+=head2 directory_entries
+
+An array reference containing a list of L<Git::Database::DirectoryEntry>
+objects representing the content of the tree.
+
+=head1 METHODS
+
+=head2 new()
+
+Create a new Git::Object::Database::Commit object.
+
+One (and only one) of the C<content> or C<directory_entries> arguments
+is required.
+
+C<directory_entires> is an array reference containing a list of
+L<Git::Database::DirectoryEntry> objects representing the content
+of the tree.
+
+=head2 as_string()
+
+The content of the tree object, in the format returned by C<git ls-tree>.
+
+=head1 SEE ALSO
+
+L<Git::Database>,
+L<Git::Database::Role::Object>.
+
+=head1 COPYRIGHT
+
+Copyright 2013 Philippe Bruhat (BooK), all rights reserved.
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut
