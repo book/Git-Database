@@ -105,6 +105,8 @@ __END__
 
 # ABSTRACT: Access to the Git object database
 
+=for Pod::Coverage::TrustPod DEMOLISH
+
 =head1 SYNOPSIS
 
     my $r = Git::Database->new( work_tree => $dir );
