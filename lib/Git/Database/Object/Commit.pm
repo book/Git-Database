@@ -119,3 +119,113 @@ sub _build_commit_info {
 }
 
 1;
+
+# ABSTRACT: A commit object in the Git object database
+
+=for Pod::Coverage::TrustPod BUILD
+
+=head1 SYNOPSIS
+
+    my $r      = Git::Database->new();       # current Git repository
+    my $commit = $r->get_object('ef25e8');   # abbreviated digest
+
+    # attributes
+    $commit->kind;              # commit
+    $commit->digest;            # ef25e81ba86b7df16956c974c8a9c1ff2eca1326
+    $commit->tree_digest;       # b52168be5ea341e918a9cbbb76012375170a439f
+    $commit->parents_digest;    # []
+    ...;                        # etc., see below
+
+=head1 DESCRIPTION
+
+Git::Database::Object::Commit represents a C<commit> object
+obtained via L<Git::Database> from a Git object database.
+
+=head1 ATTRIBUTES
+
+=head2 kind
+
+The object kind: C<commit>.
+
+=head2 digest
+
+The SHA-1 digest of the commit object.
+
+=head2 content
+
+The object's actual content.
+
+=head2 size
+
+The size (in bytes) of the object content.
+
+=head2 commit_info
+
+A hash containing the all the attributes listed below, as values
+for the keys with the same names.
+
+=head2 tree_digest
+
+The SHA-1 digest of the tree object corresponding to the commit.
+
+=head2 parents_digest
+
+An array reference containing the list of SHA-1 digests of the
+commit's parents.
+
+=head2 author
+
+A L<Git::Database::Actor> object representing the author of
+the commit.
+
+=head2 authored_time
+
+A L<DateTime> object representing the date at which the author
+created the patch.
+
+=head2 committer
+
+A L<Git::Database::Actor> object representing the committer of
+the commit.
+
+=head2 committed_time
+
+A L<DateTime> object representing the date at which the committer
+created the commit.
+
+=head2 comment
+
+The text of the commit message.
+
+=head2 encoding
+
+The encoding of the commit message.
+
+=head1 METHODS
+
+=head2 new()
+
+Create a new Git::Object::Database::Commit object.
+
+One (and only one) of the C<content> or C<commit_info> arguments is
+required.
+
+C<commit_info> is a hash containing the keys listed above, i.e.
+C<tree_digest>, C<author>, C<authored_time>, C<committer>,
+C<committed_time>, C<comment>, and C<encoding> (optional).
+
+=head1 SEE ALSO
+
+L<Git::Database>,
+L<Git::Database::Role::Object>.
+
+=head1 COPYRIGHT
+
+Copyright 2013 Philippe Bruhat (BooK), all rights reserved.
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut
