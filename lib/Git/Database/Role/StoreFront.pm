@@ -4,6 +4,7 @@ use Moo::Role;
 
 requires
   'has_object',
+  'check_object',
   'get_object',
 ;
 
@@ -32,6 +33,20 @@ Git::Database::Role::StoreFront - Role for a Git data store frontend
 Returns a boolean value indicating if the given digest is available in
 this store. If true, the returned value will be equal to the object kind
 (C<blob>, C<tree>, C<commit> or C<tag>).
+
+=head2 check_object
+
+    my ( $sha1, $kind, $size ) = $store->check_object($digest);
+
+Return the full SHA-1, object kind and size in bytes for the object
+corresponding to the given digest in the underlying repository.
+
+If C<$digest> is abbreviated, C<$sha1> is the full SHA-1 digest for
+the object.
+
+When the digest cannot be resolved to an object in the repository,
+C<$sha1> is identical to C<$digest>, C<$kind> is equal to C<missing>,
+and <$size> is C<undef>.
 
 =head2 get_object
 
