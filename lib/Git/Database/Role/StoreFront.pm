@@ -3,10 +3,15 @@ package Git::Database::Role::StoreFront;
 use Moo::Role;
 
 requires
-  'has_object',
   'check_object',
   'get_object',
 ;
+
+sub has_object {
+    my ( $self, $digest ) = @_;
+    my ( $sha1, $kind, $size ) = $self->check_object($digest);
+    return $kind eq 'missing' ? '' : $kind;
+}
 
 1;
 
@@ -33,6 +38,11 @@ Git::Database::Role::StoreFront - Role for a Git data store frontend
 Returns a boolean value indicating if the given digest is available in
 this store. If true, the returned value will be equal to the object kind
 (C<blob>, C<tree>, C<commit> or C<tag>).
+
+=head1 REQUIRED METHODS
+
+These methods are I<required> by the role, classes consuming this role
+must provide them.
 
 =head2 check_object
 
