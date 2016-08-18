@@ -32,6 +32,10 @@ considered a backend), L<Git::Database::Role::ObjectReader>,
 L<Git::Database::Role::ObjectWriter>, L<Git::Database::Role::RefReader>
 and L<Git::Database::Role::RefWriter>.
 
+L<Git::Database::Backend::None> is a special backend class
+that is not connected to a store. The only supported method is
+L<hash_object|Git::Database::Role::Backend/hash_object>.
+
 =item store
 
 The Perl Git wrapper that reads and write the data from and to the repository.
