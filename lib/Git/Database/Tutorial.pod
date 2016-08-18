@@ -1,0 +1,54 @@
+=head1 NAME
+
+Git::Database::Tutorial - Learn how to use Git::Database
+
+=head1 SYNOPSIS
+
+    use Git::Database;
+
+    # do cool stuff with Git, using the following advice
+    # and the Perl Git wrapper of your choice
+
+=head1 GLOSSARY
+
+=over 4
+
+=item repository
+
+The local Git repository, as managed by B<git>.
+
+=item backend
+
+A class doing the L<Git::Database::Role::Backend> role.
+
+It manages all interactions with the Git repository, via its L<store>.
+A backend instance is always connected to a store instance.
+
+The backend interface is split across several roles, each
+requiring one or more access methods to be defined. The
+roles are: L<Git::Database::Role::Backend> (this is
+the minimum required role that a class must do to be
+considered a backend), L<Git::Database::Role::ObjectReader>,
+L<Git::Database::Role::ObjectWriter>, L<Git::Database::Role::RefReader>
+and L<Git::Database::Role::RefWriter>.
+
+=item store
+
+The Perl Git wrapper that reads and write the data from and to the repository.
+
+A store instance is always connected to an actual Git repository.
+
+=item object
+
+An object from the Git object database. Represented in Perl by the
+L<Git::Database::Object::Blob>, L<Git::Database::Object::Tree>,
+L<Git::Database::Object::Commit> and L<Git::Database::Object::Tag>
+classes.
+
+=item ref
+
+A reference (tag or branch) in the Git repository.
+
+=back
+
+=cut
