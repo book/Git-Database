@@ -14,16 +14,18 @@ has digest => (
     is  => 'lazy',
     isa => quote_sub(
         q{ die "Not a SHA-1 digest" unless $_[0] =~ /^[0-9a-f]{40}/; }),
+    predicate => 1,
 );
 
 # size in bytes
 has size => (
-    is      => 'lazy',
-    default => sub { length $_[0]->content },
+    is        => 'lazy',
+    default   => sub { length $_[0]->content },
+    predicate => 1,
 );
 
 has content => (
-    is => 'lazy',
+    is        => 'lazy',
     predicate => 1,
 );
 
