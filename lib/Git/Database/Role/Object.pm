@@ -1,42 +1,48 @@
 package Git::Database::Role::Object;
 
-use Moo::Role;
 use Sub::Quote;
+
+use Moo::Role;
 
 requires qw( kind );
 
-has repository => (
-    is       => 'ro',
-    required => 1,
+has backend => (
+    is      => 'lazy',
+    builder => sub {
+        require Git::Database::Backend::None;
+        return Git::Database::Backend::None->new;
+    },
+    isa => sub {
+        die "$_[0] DOES not Git::Database::Role::Backend"
+          if !eval { $_[0]->does('Git::Database::Role::Backend') };
+    },
 );
 
 has digest => (
-    is     => 'lazy',
-    coerce => sub { lc $_[0] },
+    is      => 'lazy',
+    builder => sub { $_[0]->backend->hash_object( $_[0] ); },
+    coerce  => sub { lc $_[0] },
     isa =>
       quote_sub(q{ die "Not a SHA-1 digest" if $_[0] !~ /^[0-9a-f]{40}/; }),
     predicate => 1,
 );
 
-# size in bytes
 has size => (
     is        => 'lazy',
-    default   => sub { length $_[0]->content },
+    builder   => sub { length $_[0]->content },
     predicate => 1,
 );
 
 has content => (
-    is        => 'lazy',
+    is      => 'lazy',
+    builder => sub {
+        my ( $digest, $backend ) = ( $_[0]->digest, $_[0]->backend );
+        my $attr = $backend->get_object_attributes($digest);
+        die "$digest not found in $backend" if !$attr;
+        return $attr->{content};
+    },
     predicate => 1,
 );
-
-# to compute the digest of a new object, save it in the object database
-sub _build_digest {
-    my ($self) = @_;
-    return
-        scalar $self->repository->run( 'hash-object', '-t', $self->kind,
-        '--stdin', '-w', { input => $self->content } );
-}
 
 sub as_string { $_[0]->content; }
 
