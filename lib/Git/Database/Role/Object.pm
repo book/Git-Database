@@ -11,9 +11,10 @@ has repository => (
 );
 
 has digest => (
-    is  => 'lazy',
-    isa => quote_sub(
-        q{ die "Not a SHA-1 digest" unless $_[0] =~ /^[0-9a-f]{40}/; }),
+    is     => 'lazy',
+    coerce => sub { lc $_[0] },
+    isa =>
+      quote_sub(q{ die "Not a SHA-1 digest" if $_[0] !~ /^[0-9a-f]{40}/; }),
     predicate => 1,
 );
 
