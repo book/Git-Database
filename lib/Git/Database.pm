@@ -17,6 +17,7 @@ has backend => (
     handles => [
         'hash_object',        # Git::Database::Role::Backend
         'get_object_meta',    # Git::Database::Role::ObjectReader
+        'get_object_attributes',
         'get_object',
         'get_hashes',
         'has_object',
