@@ -33,69 +33,102 @@ has backend => (
 
 __END__
 
-# ABSTRACT: Access to the Git object database
+=pod
 
-=for Pod::Coverage::TrustPod DEMOLISH
+=head1 NAME
+
+Git::Database - Provide access to the Git object database
 
 =head1 SYNOPSIS
 
-    my $r = Git::Database->new( work_tree => $dir );
-
 =head1 DESCRIPTION
 
-Git::Database is a L<Moo>-based subclass of L<Git::Repository> that
-provides access from Perl to the object database stored in a Git
-repository.
+Git::Database provides access from Perl to the object database stored
+in a Git repository. It can use any supported Git wrapper to access
+the Git object database maintained by Git.
 
 =head1 ATTRIBUTES
 
-The public attributes are all provided by L<Git::Repository>.
+=head2 backend
+
+A object doing the L<Git::Database::Role::Backend> role, used to access
+the data in the Git repository.
+
+If none is provided, defaults to using the very limited
+L<Git::Database::Backend::None>.
 
 =head1 METHODS
 
-=head2 has_object( $digest )
+All the backend methods are delegated to the L</backend> attribute.
 
-Given a digest value (possibly abbreviated), C<has_object> returns (in
-scalar context) a a boolean indicating if the corresponding object is
-in the database. In list context and if the object is in the database,
-it returns the complete digest, the object type and its size. Otherwise
-it returns the requested C<$digest>, the string C<missing> and the
-C<undef> value.
+The backend methods are split between several roles, and not all backends
+do all the roles. Therefore not all backend objects support all these
+methods.
 
-Example:
+=head2 From L<Git::Database::Role::Backend>
 
-    # assuming 4b825dc642cb6eb9a060e54bf8d69288fbee4904 (the empty tree)
-    # is in the database and 123456 is not
+This is the minimum required role to be a backend. Hence this method is
+always available.
 
-    # scalar context
-    $bool = $r->has_object('4b825dc642cb6eb9a060e54bf8d69288fbee4904'); # true
-    $bool = $r->has_object('4b825d');    # also true
-    $bool = $r->has_object('123456');    # false
+=over 4
 
-    # list context
-    # ( '4b825dc642cb6eb9a060e54bf8d69288fbee4904', 'tree', 0 );
-    ( $digest, $kind, $size ) = $r->has_object('4b825d');
+=item L<hash_object|Git::Database::Role::Backend/hash_object>
 
-    # ( '123456', 'missing, undef )
-    ( $digest, $kind, $size ) = $r->has_object('123456');
+=back
 
-=head2 get_object( $digest )
+=head2 From L<Git::Database::Role::ObjectReader>
 
-Given a digest value (possibly abbreviated), C<get_object>
-returns the full object extracted from the Git database (one of
-L<Git::Database::Object::Blob>, L<Git::Database::Object::Tree>,
-L<Git::Database::Object::Commit>, or L<Git::Database::Object::Tag>).
+=over 4
 
-Returns C<undef> if the object is not in the Git database.
+=item L<get_object_meta|Git::Database::Role::ObjectReader/get_object_meta>
 
-Example:
+=item L<get_object_attributes|Git::Database::Role::ObjectReader/get_object_attributes>
 
-    # a Git::Database::Object::Tree representing the empty tree
-    $tree = $r->get_object('4b825dc642cb6eb9a060e54bf8d69288fbee4904');
-    $tree = $r->get_object('4b825d');    # idem
+=item L<get_object|Git::Database::Role::ObjectReader/get_object>
 
-    # undef
-    $tree = $r->get_object('123456');
+=item L<get_hashes|Git::Database::Role::ObjectReader/get_hashes>
+
+=back
+
+=head2 From L<Git::Database::Role::ObjectWriter>
+
+=over 4
+
+=item L<put_object|Git::Database::Role::ObjectWriter/put_object>
+
+=back
+
+=head2 From L<Git::Database::Role::RefReader>
+
+=over 4
+
+=item L<resolve_ref|Git::Database::Role::RefReader/resolve_ref>
+
+=item L<get_refs|Git::Database::Role::RefReader/get_refs>
+
+=back
+
+=head2 From L<Git::Database::Role::RefWriter>
+
+=over 4
+
+=item L<put_ref|Git::Database::Role::RefWriter/put_ref>
+
+=item L<delete_ref|Git::Database::Role::RefWriter/delete_ref>
+
+=back
+
+=head1 SEE ALSO
+
+L<Git::Database::Object::Blob>,
+L<Git::Database::Object::Tree>,
+L<Git::Database::Object::Commit>,
+L<Git::Database::Object::Tag>,
+L<Git::Database::Role::Backend>,
+L<Git::Database::Role::ObjectReader>.
+L<Git::Database::Role::ObjectWriter>.
+L<Git::Database::Role::RefReader>.
+L<Git::Database::Role::RefWriter>.
 
 =head1 SUPPORT
 
@@ -110,10 +143,6 @@ You can also look for information at:
 =item * RT: CPAN's request tracker
 
 L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Git-Database>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Git-Database>
 
 =item * CPAN Ratings
 
@@ -131,7 +160,7 @@ L<http://metacpan.org/release/Git-Database>
 
 =head1 COPYRIGHT
 
-Copyright 2013 Philippe Bruhat (BooK), all rights reserved.
+Copyright 2013-2016 Philippe Bruhat (BooK), all rights reserved.
 
 =head1 LICENSE
 
