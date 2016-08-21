@@ -1,7 +1,65 @@
 use strict;
 use warnings;
 
+# don't load extra subs, or run any import
+use File::Spec          ();
+use File::Temp          ();
+use File::Basename      ();
+use Test::Requires::Git ();
+
 # all the following functions will end up in the caller's namespace
+
+# test data
+sub objects_from {
+    my ($name) = @_;
+    my $perl = File::Spec->catfile( qw( t bundles ), "$name.perl" );
+
+    # TODO: looks in @INC, saves in %INC, is it really wanted?
+    # we could just slurp and eval the content of the file.
+    my $objects = do $perl;
+
+    # add extra information
+    for my $kind ( keys %$objects ) {
+        for my $object ( @{ $objects->{$kind} } ) {
+            $object->{kind} = $kind;
+            $object->{sha1} = $object->{digest};
+            $object->{size} = length $object->{content};
+            $object->{string} ||= $object->{content};
+        }
+    }
+
+    return $objects;
+}
+
+sub repository_from {
+    my ($name) = @_;
+    my $bundle = File::Spec->catfile( qw( t bundles ), "$name.bundle" );
+    my $dir = File::Temp::tempdir( CLEANUP => 1 );
+
+    Test::Requires::Git::test_requires_git '1.6.5';
+    `git clone $bundle $dir`;
+    die "Cloning $bundle in $dir failed" if $?;
+
+    return $dir;
+}
+
+# helpers
+my %test_data;
+for my $file ( glob File::Spec->catfile(qw( t bundles * )) ) {
+    my ( $name, undef, $ext ) =
+      File::Basename::fileparse( $file, qw( .perl .bundle ) );
+    $test_data{$name}{$ext} = $file;
+}
+
+sub available_objects {
+    return grep exists $test_data{$_}{'.perl'}, keys %test_data;
+}
+
+sub available_bundles {
+    return grep exists $test_data{$_}{'.bundle'}, keys %test_data;
+}
+
+sub bundle_for { return $test_data{ $_[0] }{'.bundle'} }
 
 # extra kind-specific tests
 my %test_for = (
