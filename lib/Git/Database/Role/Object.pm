@@ -50,9 +50,11 @@ sub as_string { $_[0]->content; }
 
 __END__
 
-# ABSTRACT: Role for objects from the Git object database
-
 =pod
+
+=head1 NAME
+
+Git::Database::Role::Object - Role for objects from the Git object database
 
 =head1 SYNOPSIS
 
@@ -69,23 +71,42 @@ __END__
 =head1 DESCRIPTION
 
 Git::Database::Role::Object provides the generic behaviour for all
-L<Git::Database> objects obtained from or stored into the git object
+L<Git::Database> objects obtained from or stored into the Git object
 database.
 
-When creating a new object meant to be added to the Git object database,
-only the C<content> attribute is actually required. L<Git::Database>
-is really the only module that will set all attributes, when it actually
-fetches the object data from the Git object database.
+When creating a new object meant to be added to the Git object database
+(via L<backend>), only the L</content> attribute is actually required.
+
+New objects are typically created via L<Git::Database>'s
+L<create_object|Git::Database/create_object> method, rathen than by
+calling C<new> directly. This is when the object data is fetched from
+the Git object database.
+
+=head1 ATTRIBUTES
+
+The L<content>, L<size> and L<digest> attribute are lazy, and can be
+computed from the others: L<size> from L<content>, L<content> from
+L<digest> (if the object exists in the backend store), and L<digest>
+from L<content>.
+
+Additional attributes in some classes may add other way to compute
+the content.
 
 Creating a new object with inconsistent C<kind>, C<size>, C<content>
 and C<digest> attributes can only end in tears.
 
-=head1 ATTRIBUTES
+For now, as soon as the L</content> of a Git::Database::Role::Object is
+needed, it is fully loaded in memory. In future releases, it is planned
+to add a feature where the content is available via a filehandle, so that
+it's never needed to have the whole object content in memory.
 
-=head2 repository
+=head2 backend
 
-The L<Git::Database> repository from which the object comes from
-(or will be stored into).
+A L<Git::Database::Role::Backend> from which the object comes from
+(or will be stored into). It is typically used by the attribute builders.
+
+If none is provided, a L<Git::Database::Backend::None> is used, which
+is only able to compute the L<digest>.
 
 =head2 content
 
@@ -98,6 +119,8 @@ The size (in bytes) of the object content.
 =head2 digest
 
 The SHA-1 digest of the object, as computed by Git.
+
+If set at creation time, it is internally converted to lowercase.
 
 =head1 METHODS
 
@@ -125,7 +148,7 @@ L<Git::Database::Object::Tag>.
 
 =head1 COPYRIGHT
 
-Copyright 2013 Philippe Bruhat (BooK), all rights reserved.
+Copyright 2013-2016 Philippe Bruhat (BooK), all rights reserved.
 
 =head1 LICENSE
 
