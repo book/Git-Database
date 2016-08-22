@@ -69,6 +69,12 @@ sub available_bundles {
     return grep exists $test_data{$_}{'.bundle'}, keys %test_data;
 }
 
+sub available_backends {
+    return 'None',    # always available
+      map eval { Module::Runtime::use_module($_) }, qw(
+    );
+}
+
 sub bundle_for { return $test_data{ $_[0] }{'.bundle'} }
 
 # extra kind-specific tests
