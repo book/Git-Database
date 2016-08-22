@@ -48,4 +48,15 @@ like(
     '... expected error message'
 );
 
+ok(
+    !eval { $db = Git::Database->new( store => bless( {}, 'Nope' ) ) },
+    'Git::Database::Backend::Nope does not exist'
+);
+like(
+    $@,
+    qr{^Can't locate Git/Database/Backend/Nope.pm in \@INC },
+    '... expected error message'
+);
+
+
 done_testing;
