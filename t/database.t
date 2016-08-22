@@ -19,6 +19,12 @@ for my $backend ( available_backends() ) {
     isa_ok( $db,          'Git::Database' );
     isa_ok( $db->backend, "Git::Database::Backend::$backend" );
     isa_ok( $db->backend->store, $backend ) if $backend ne 'None';
+
+    # build backend from store
+    $db = Git::Database->new( store => store_for( $backend, $dir ) );
+    isa_ok( $db,          'Git::Database' );
+    isa_ok( $db->backend, "Git::Database::Backend::$backend" );
+    isa_ok( $db->backend->store, $backend ) if $backend ne 'None';
 }
 
 # some error cases
@@ -29,6 +35,16 @@ ok(
 like(
     $@,
     qr/^isa check for "backend" failed: fail DOES not Git::Database::Role::Backend/,
+    '... expected error message'
+);
+
+ok(
+    !eval { $db = Git::Database->new( backend => 'backend', store => 'store' ) },
+    'backend and store are mutually exclusive'
+);
+like(
+    $@,
+    qr/^'store' and 'backend' attributes are mutually exclusive /,
     '... expected error message'
 );
 
