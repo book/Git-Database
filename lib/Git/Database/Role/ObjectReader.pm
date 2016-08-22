@@ -10,7 +10,7 @@ use Moo::Role;
 requires
   'get_object_meta',
   'get_object_attributes',
-  'get_hashes',
+  'all_digests',
   ;
 
 sub has_object {
@@ -117,15 +117,17 @@ to create the actual object instance.
 
 Otherwise return the C<undef> value.
 
-=head2 get_hashes
+=head2 all_digests
 
-    # all the hashes contained in the Git database
-    my @sha1 = $backend->get_hashes();
+    # all the digests contained in the Git database
+    my @sha1 = $backend->all_digests();
 
     # filter by kind
-    my @trees = $backend->get_hashes('tree');
+    my @trees = $backend->all_digests('tree');
 
 Return all the digests contained in the Git object database.
+If a L<kind|Git::Database::Role::Object/kind> argument is provided,
+only return the digests for that specific object kind.
 
 =head1 COPYRIGHT
 
