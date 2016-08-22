@@ -8,10 +8,6 @@ use Git::Database::DirectoryEntry;
 # test data as hash ref
 {
     blob => [
-        {   desc    => 'empty blob',
-            content => '',
-            digest  => 'e69de29bb2d1d6434b8b29ae775ad8c2e48c5391',
-        },
         {   desc    => 'hello blob',
             content => 'hello',
             digest  => 'b6fc4c620b67d95f953a5c1c1230aaab5db5a1b0',
