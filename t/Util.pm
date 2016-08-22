@@ -38,7 +38,7 @@ sub repository_from {
 
     Test::Requires::Git::test_requires_git '1.6.5';
     `git clone $bundle $dir`;
-    die "Cloning $bundle in $dir failed" if $?;
+    die "`git clone $bundle $dir` failed" if $?;
 
     return $dir;
 }
