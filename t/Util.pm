@@ -43,6 +43,16 @@ sub repository_from {
     return $dir;
 }
 
+sub empty_repository {
+    my $dir = File::Temp::tempdir( CLEANUP => 1 );
+
+    Test::Requires::Git::test_requires_git '1.6.5';
+    `git init $dir`;
+    die "`git init $dir` failed" if $?;
+
+    return $dir;
+}
+
 # helpers
 my %test_data;
 for my $file ( glob File::Spec->catfile(qw( t bundles * )) ) {
