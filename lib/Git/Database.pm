@@ -29,6 +29,20 @@ has backend => (
     ],
 );
 
+sub BUILDARGS {
+    my $args = Moo::Object::BUILDARGS(@_);
+
+    die "'store' and 'backend' attributes are mutually exclusive"
+      if exists $args->{store} && exists $args->{backend};
+
+    if ( my $store = delete $args->{store} ) {
+        $args->{backend} = use_module( "Git::Database::Backend::" . ref $store )
+          ->new( store => $store );
+    }
+
+    return $args;
+}
+
 1;
 
 __END__
@@ -40,6 +54,16 @@ __END__
 Git::Database - Provide access to the Git object database
 
 =head1 SYNOPSIS
+
+    # get a store
+    my $r  = Git::Repository->new();
+
+    # provide the backend
+    my $b  = Git::Database::Backend::Git::Repository->new( store => $r );
+    my $db = Git::Database->new( backend => $b );
+
+    # let Git::Database figure it out by itself
+    my $db = Git::Database->new( store => $r );
 
 =head1 DESCRIPTION
 
@@ -56,6 +80,9 @@ the data in the Git repository.
 
 If none is provided, defaults to using the very limited
 L<Git::Database::Backend::None>.
+
+If a C<store|Git::Database::Tutorial/store> attribute is provided,
+the C<backend> for it is automatically generated.
 
 =head1 METHODS
 
