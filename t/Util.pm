@@ -2,6 +2,7 @@ use strict;
 use warnings;
 
 # don't load extra subs, or run any import
+use Module::Runtime     ();
 use File::Spec          ();
 use File::Temp          ();
 use File::Basename      ();
@@ -51,6 +52,18 @@ sub empty_repository {
     die "`git init $dir` failed" if $?;
 
     return $dir;
+}
+
+# build a store from a repository directory
+my %builder_for = (
+    'None' => sub { '' },    # ignored by Git::Database::Backend::None
+);
+
+sub store_for { return $builder_for{ $_[0] }->( $_[1] ); }
+
+sub backend_for {
+    Module::Runtime::use_module("Git::Database::Backend::$_[0]")
+      ->new( store => store_for( $_[0], $_[1] ) );
 }
 
 # helpers
