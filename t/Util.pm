@@ -8,6 +8,16 @@ use File::Temp          ();
 use File::Basename      ();
 use Test::Requires::Git ();
 
+# Git::Database objects
+use Git::Database::Object::Blob;
+use Git::Database::Object::Tree;
+use Git::Database::Object::Commit;
+use Git::Database::Object::Tag;
+
+use Git::Database::Backend::None;
+
+my @kinds = qw( blob tree commit tag );
+
 # all the following functions will end up in the caller's namespace
 
 # test data
@@ -163,4 +173,33 @@ sub cmp_git_objects {
     $cmp_for{$kind}->( $object, $test ) if exists $cmp_for{$kind};
 }
 
+sub test_kind {
+    my %code_for = @_;
+
+    # loop over all available object sources
+    for my $source (available_objects) {
+        my $objects = objects_from($source);
+
+        # and all available backends
+        for my $backend ( available_backends() ) {
+
+            # if we have a .bundle for the repository, connect the backend to it
+            my $Backend =
+                bundle_for($source)
+              ? backend_for( $backend, repository_from($source) )
+              : backend_for( $backend, empty_repository() );
+
+            # test all objects
+            for my $kind (@kinds) {
+                next if !exists $code_for{$kind};
+                subtest(
+                    "$backend & $source ${kind}s",
+                    sub {
+                        $code_for{$kind}->( $Backend, @{ $objects->{$kind} } );
+                    }
+                );
+            }
+        }
+    }
+}
 1;
