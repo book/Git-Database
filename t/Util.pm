@@ -193,7 +193,10 @@ sub test_kind {
 
             # test all objects
             for my $kind (@kinds) {
-                next if !exists $code_for{$kind};
+                next
+                  if !exists $code_for{$kind}
+                  || !exists $objects->{$kind}
+                  || !@{ $objects->{$kind} };
                 subtest(
                     "$backend & $source ${kind}s",
                     sub {
