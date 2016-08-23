@@ -174,7 +174,9 @@ sub cmp_git_objects {
 }
 
 sub test_kind {
-    my %code_for = @_;
+    my %code_for = @_ == 1
+      ? map +( $_ => $_[0] ), @kinds    # the same coderef for every kind
+      : @_;                             # one coderef per kind
 
     # loop over all available object sources
     for my $source (available_objects) {
