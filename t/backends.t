@@ -78,6 +78,37 @@ test_kind(
                 }
             );
 
+            # check the object can't be found in an empty repository
+            subtest(
+                "$test->{desc} [not found in empty repository]",
+                sub {
+
+                    # object is not in the empty database
+                    plan skip_all => 'The empty tree is a special case in Git',
+                      if $kind eq 'tree'
+                      && $digest eq '4b825dc642cb6eb9a060e54bf8d69288fbee4904';
+
+                    # has_object
+                    ok(
+                        !$nil->has_object($digest),
+                        "has_object( $digest ): missing"
+                    );
+
+                    # get_object_meta
+                    is_deeply(
+                        [ $nil->get_object_meta($digest) ],
+                        [ $digest, 'missing', undef ],
+                        "get_object_meta( $digest ): missing"
+                    );
+
+                    # get_object
+                    is( $nil->get_object($digest),
+                        undef, "get_object( $digest ): missing" );
+
+                    done_testing;
+                }
+            ) if $is_reader;
+
         }
     }
 );
