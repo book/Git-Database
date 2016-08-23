@@ -202,6 +202,7 @@ sub test_kind {
                     sub {
                         $code_for{$kind}
                           ->( $Backend, $is_empty, @{ $objects->{$kind} } );
+                        done_testing;
                     }
                 );
             }
