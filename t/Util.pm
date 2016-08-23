@@ -179,7 +179,7 @@ sub test_kind {
       : @_;                             # one coderef per kind
 
     # loop over all available object sources
-    for my $source (available_objects) {
+    for my $source ( sort( available_objects() ) ) {
         my $objects = objects_from($source);
 
         # and all available backends
