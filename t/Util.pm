@@ -186,10 +186,10 @@ sub test_kind {
         for my $backend ( available_backends() ) {
 
             # if we have a .bundle for the repository, connect the backend to it
-            my $Backend =
-                bundle_for($source)
-              ? backend_for( $backend, repository_from($source) )
-              : backend_for( $backend, empty_repository() );
+            my ( $is_empty, $Backend ) =
+              bundle_for($source)
+              ? ( 0, backend_for( $backend, repository_from($source) ) )
+              : ( 1, backend_for( $backend, empty_repository() ) );
 
             # test all objects
             for my $kind (@kinds) {
@@ -197,7 +197,8 @@ sub test_kind {
                 subtest(
                     "$backend & $source ${kind}s",
                     sub {
-                        $code_for{$kind}->( $Backend, @{ $objects->{$kind} } );
+                        $code_for{$kind}
+                          ->( $Backend, $is_empty, @{ $objects->{$kind} } );
                     }
                 );
             }
