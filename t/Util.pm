@@ -38,8 +38,8 @@ sub repository_from {
     my $dir = File::Temp::tempdir( CLEANUP => 1 );
 
     Test::Requires::Git::test_requires_git '1.6.5';
-    `git clone $bundle $dir`;
-    die "`git clone $bundle $dir` failed" if $?;
+    `git clone -q $bundle $dir`;
+    die "`git clone -q $bundle $dir` failed" if $?;
 
     return $dir;
 }
