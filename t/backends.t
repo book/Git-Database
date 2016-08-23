@@ -109,6 +109,27 @@ test_kind(
                 }
             ) if $is_reader;
 
+            # check the object can be found in its own repository
+            subtest(
+                "$test->{desc} [found in its own repository]",
+                sub {
+                    # has_object
+                    ok( $db->has_object($digest), "has_object( $digest )" );
+
+                    # get_object_meta
+                    is_deeply(
+                        [ $db->get_object_meta($digest) ],
+                        [ $digest, $kind, $test->{size} ],
+                        "get_object_meta( $digest )"
+                    );
+
+                    # fetching the object
+                    cmp_git_objects( $db->get_object($digest), $test );
+
+                    done_testing;
+                }
+            ) if $is_reader && !$is_empty;
+
         }
     }
 );
