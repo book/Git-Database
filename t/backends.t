@@ -3,17 +3,7 @@ use warnings;
 use Test::More;
 use Git::Database;
 
-use Git::Database::Object::Blob;
-use Git::Database::Object::Tree;
-use Git::Database::Object::Commit;
-use Git::Database::Object::Tag;
-
 use t::Util;
-
-# a database with no store
-my $db = Git::Database->new();
-isa_ok( $db,          'Git::Database' );
-isa_ok( $db->backend, 'Git::Database::Backend::None' );
 
 # different object kinds work with different possible arguments
 my %args_for = (
@@ -42,27 +32,46 @@ my %args_for = (
     },
 );
 
-# test over all available objects
-for my $source (available_objects) {
-    diag "Using objects from $source";
-    my $objects = objects_from($source);
+test_kind(
+    sub {
+        my ( $backend, $is_empty, @objects ) = @_;
+        my $is_reader = $backend->does('Git::Database::Role::ObjectReader');
 
-    for my $test ( map @{ $objects->{$_} }, sort keys %$objects ) {
-        my ( $kind, $digest, $size ) = @{$test}{qw( kind digest size )};
+        # a database for this backend
+        my $db = Git::Database->new( backend => $backend );
 
-        diag $test->{desc};
+        # figure out the store class
+        my $class = substr( ref $backend, 24 );  # drop Git::Database::Backend::
 
-        # create object
-        for my $args ( $args_for{$kind}->($test) ) {
+        # a database pointing to an empty repository
+        my $nil =
+          Git::Database->new( store => store_for( $class, empty_repository ) );
 
-            # this test computes the digest
-            my $object = "Git::Database::Object::\u$kind"->new( @$args );
-            cmp_git_objects( $object, $test );
+        for my $test (@objects) {
+            my ( $kind, $digest, $size ) = @{$test}{qw( kind digest size )};
 
-            # Git::Database::Role::Backend
-            is( $db->hash_object($object), $test->{digest}, 'hash_object' );
+            subtest(
+                $test->{desc},
+                sub {
+
+                    # this test computes the digest
+                    for my $args ( $args_for{$kind}->($test) ) {
+
+                        my $object =
+                          "Git::Database::Object::\u$kind"->new(@$args);
+
+                        is( $nil->hash_object($object),
+                            $test->{digest}, "hash_object: $test->{digest}" );
+
+                        cmp_git_objects( $object, $test );
+                    }
+
+                    done_testing;
+                }
+            );
+
         }
     }
-}
+);
 
 done_testing;
