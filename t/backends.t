@@ -47,6 +47,14 @@ test_kind(
         my $nil =
           Git::Database->new( store => store_for( $class, empty_repository ) );
 
+        # pick some random sha1 and check it's not in the empty repository
+        if ($is_reader) {
+            my $sha1 = join '', map sprintf( '%02x', rand 256 ), 1 .. 20;
+            is( $nil->has_object($sha1), '', "Database does not have $sha1" );
+            is( $nil->get_object($sha1),
+                undef, "Database can't get an object for $sha1" );
+        }
+
         for my $test (@objects) {
             my ( $kind, $digest, $size ) = @{$test}{qw( kind digest size )};
 
