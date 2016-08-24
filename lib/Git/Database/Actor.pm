@@ -12,13 +12,7 @@ has email => (
     required => 1,
 );
 
-# private attributes
-has ident => (
-    is       => 'lazy',
-    init_arg => undef,
-);
-
-sub _build_ident { $_[0]->name . ' <' . $_[0]->email . '>' }
+sub ident { $_[0]->name . ' <' . $_[0]->email . '>' }
 
 1;
 
@@ -51,6 +45,8 @@ The name of the actor.
 =head2 email
 
 The email of the actor.
+
+=head1 METHODS
 
 =head2 ident
 
