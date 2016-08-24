@@ -89,11 +89,15 @@ computed from the others: L<size> from L<content>, L<content> from
 L<digest> (if the object exists in the backend store), and L<digest>
 from L<content>.
 
-Additional attributes in some classes may add other way to compute
+Additional attributes in some classes may add other ways to compute
 the content.
 
-Creating a new object with inconsistent C<kind>, C<size>, C<content>
-and C<digest> attributes can only end in tears.
+Creating a new object with inconsistent C<kind>, C<size>,
+C<content> and C<digest> attributes can only end in
+tears. This is also true for additional attributes such as
+L<directory_entries|Git::Database::Object::Tree/directory_entries>,
+L<commit_info|Git::Database::Object::Commit/commit_info>, and
+L<tag_info|Git::Database::Object::Tag/tag_info>.
 
 For now, as soon as the L</content> of a Git::Database::Role::Object is
 needed, it is fully loaded in memory. In future releases, it is planned

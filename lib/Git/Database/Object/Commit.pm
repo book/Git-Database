@@ -41,15 +41,6 @@ my %method_map = (
     'committer' => 'committed_time'
 );
 
-# ensure at least one but not both content or commit_info is defined
-sub BUILD {
-    my ($self) = @_;
-    die "At least one of 'content' or 'commit_info' must be defined"
-        if !$self->has_content && !$self->has_commit_info;
-    die "At most one of 'content' and 'commit_info' can be defined"
-        if $self->has_content && $self->has_commit_info;
-}
-
 # assumes commit_info is set
 sub _build_content {
     my ($self) = @_;

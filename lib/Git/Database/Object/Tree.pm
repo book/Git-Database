@@ -16,13 +16,8 @@ has directory_entries => (
     builder   => 1,
 );
 
-# ensure at least one but not both content or directory_entries is defined
 sub BUILD {
     my ($self) = @_;
-    die "At least one of 'content' or 'directory_entries' must be defined"
-        if !$self->has_content && !$self->has_directory_entries;
-    die "At most one of 'content' and 'directory_entries' can be defined"
-        if $self->has_content && $self->has_directory_entries;
 
     # sort directory entries
     $self->_set_directory_entries(
