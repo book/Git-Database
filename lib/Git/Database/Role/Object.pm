@@ -16,6 +16,7 @@ has backend => (
         die "$_[0] DOES not Git::Database::Role::Backend"
           if !eval { $_[0]->does('Git::Database::Role::Backend') };
     },
+    predicate => 1,
 );
 
 has digest => (
