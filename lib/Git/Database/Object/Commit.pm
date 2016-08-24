@@ -44,8 +44,11 @@ my %method_map = (
 # assumes commit_info is set
 sub _build_content {
     my ($self) = @_;
-    my $content;
-    $content .= 'tree ' . $self->tree_digest . "\n";
+
+    return Git::Database::Role::Object::_build_content($self)
+      if !$self->has_commit_info;
+
+    my $content .= 'tree ' . $self->tree_digest . "\n";
     $content .= "parent $_\n" for $self->parents_digest;
     $content .= join(
         ' ',

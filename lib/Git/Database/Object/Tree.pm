@@ -29,7 +29,9 @@ sub BUILD {
 
 # assumes directory_entries is set
 sub _build_content {
-    return join '', map $_->as_content, @{ $_[0]->directory_entries };
+    return $_[0]->has_directory_entries
+      ? join '', map $_->as_content, @{ $_[0]->directory_entries }
+      : Git::Database::Role::Object::_build_content( $_[0] );
 }
 
 # assumes content is set

@@ -60,6 +60,10 @@ sub _build_tag_info {
 
 sub _build_content {
     my ($self) = @_;
+
+    return Git::Database::Role::Object::_build_content($self)
+      if !$self->has_tag_info;
+
     my $content;
     $content .= "$_ " . $self->$_ . "\n" for qw( object type tag );
     $content .= join(
