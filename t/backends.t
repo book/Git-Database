@@ -57,7 +57,7 @@ for my $source (available_objects) {
 
             # this test computes the digest
             my $object = "Git::Database::Object::\u$kind"->new( @$args );
-            test_object( $object, $test );
+            cmp_git_objects( $object, $test );
 
             # Git::Database::Role::Backend
             is( $db->hash_object($object), $test->{digest}, 'hash_object' );

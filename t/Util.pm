@@ -91,7 +91,7 @@ sub available_backends {
 sub bundle_for { return $test_data{ $_[0] }{'.bundle'} }
 
 # extra kind-specific tests
-my %test_for = (
+my %cmp_for = (
     tree => sub {
         my ( $tree, $test ) = @_;
         is_deeply(
@@ -146,7 +146,7 @@ my %test_for = (
 );
 
 # test routines
-sub test_object {
+sub cmp_git_objects {
     my ( $object, $test ) = @_;
 
     my $kind = $object->kind;
@@ -160,7 +160,7 @@ sub test_object {
     is( $object->as_string, $test->{string},  '* as_string' );
 
     # run the kind-specific tests
-    $test_for{$kind}->( $object, $test ) if exists $test_for{$kind};
+    $cmp_for{$kind}->( $object, $test ) if exists $cmp_for{$kind};
 }
 
 1;
