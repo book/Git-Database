@@ -22,14 +22,24 @@ test_kind(
                 sub {
 
                     # digest
-                    is(
-                        Git::Database::Object::Blob->new(
-                            backend => $backend,
-                            digest  => $test->{digest},
-                          )->content,
-                        $test->{content},
-                        'digest -> content'
-                    ) if $is_reader && !$is_empty;
+                    if ( $is_reader && !$is_empty ) {
+                        is(
+                            Git::Database::Object::Blob->new(
+                                backend => $backend,
+                                digest  => $test->{digest},
+                              )->content,
+                            $test->{content},
+                            'digest -> content'
+                        );
+                        is(
+                            Git::Database::Object::Blob->new(
+                                backend => $backend,
+                                digest  => $test->{digest},
+                              )->size,
+                            $test->{size},
+                            'digest -> size'
+                        );
+                    }
 
                     # content
                     is(
@@ -39,6 +49,14 @@ test_kind(
                           )->digest,
                         $test->{digest},
                         'content -> digest'
+                    );
+                    is(
+                        Git::Database::Object::Blob->new(
+                            backend => $backend,
+                            content => $test->{content},
+                          )->size,
+                        $test->{size},
+                        'content -> size'
                     );
 
                     done_testing;
@@ -65,6 +83,14 @@ test_kind(
                             $test->{content},
                             'digest -> content'
                         );
+                        is(
+                            Git::Database::Object::Tree->new(
+                                backend => $backend,
+                                digest  => $test->{digest},
+                              )->size,
+                            $test->{size},
+                            'digest -> size'
+                        );
                         is_deeply(
                             Git::Database::Object::Tree->new(
                                 backend => $backend,
@@ -86,6 +112,14 @@ test_kind(
                           )->digest,
                         $test->{digest},
                         'content -> digest'
+                    );
+                    is(
+                        Git::Database::Object::Tree->new(
+                            backend => $backend,
+                            content => $test->{content}
+                          )->size,
+                        $test->{size},
+                        'content -> size'
                     );
                     is_deeply(
                         Git::Database::Object::Tree->new(
@@ -115,6 +149,14 @@ test_kind(
                           )->content,
                         $test->{content},
                         'directory_entries -> content'
+                    );
+                    is(
+                        Git::Database::Object::Tree->new(
+                            backend           => $backend,
+                            directory_entries => $test->{directory_entries}
+                          )->size,
+                        $test->{size},
+                        'directory_entries -> size'
                     );
 
                     done_testing;
