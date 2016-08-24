@@ -191,7 +191,6 @@ COMMIT
                     time_zone => '+0100'
                 ),
                 comment  => 'bonjour',
-                encoding => 'utf-8',
             },
             content => << 'TAG',
 object ef25e81ba86b7df16956c974c8a9c1ff2eca1326
