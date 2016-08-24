@@ -46,6 +46,82 @@ test_kind(
             );
         }
     },
+    tree => sub {
+        my ( $backend, $is_empty, @items ) = @_;
+        my $is_reader = $backend->does('Git::Database::Role::ObjectReader');
+
+        for my $test (@items) {
+            subtest(
+                $test->{desc},
+                sub {
+
+                    # digest
+                    if ( $is_reader && !$is_empty ) {
+                        is(
+                            Git::Database::Object::Tree->new(
+                                backend => $backend,
+                                digest  => $test->{digest},
+                              )->content,
+                            $test->{content},
+                            'digest -> content'
+                        );
+                        is_deeply(
+                            Git::Database::Object::Tree->new(
+                                backend => $backend,
+                                digest  => $test->{digest},
+                              )->directory_entries,
+                            [
+                                sort { $a->filename cmp $b->filename }
+                                  @{ $test->{directory_entries} }
+                            ],
+                            'digest -> directory_entries'
+                        );
+                    }
+
+                    # content
+                    is(
+                        Git::Database::Object::Tree->new(
+                            backend => $backend,
+                            content => $test->{content}
+                          )->digest,
+                        $test->{digest},
+                        'content -> digest'
+                    );
+                    is_deeply(
+                        Git::Database::Object::Tree->new(
+                            backend => $backend,
+                            content => $test->{content}
+                          )->directory_entries,
+                        [
+                            sort { $a->filename cmp $b->filename }
+                              @{ $test->{directory_entries} }
+                        ],
+                        'content -> directory_entries'
+                    );
+
+                    # directory_entries
+                    is(
+                        Git::Database::Object::Tree->new(
+                            backend           => $backend,
+                            directory_entries => $test->{directory_entries}
+                          )->digest,
+                        $test->{digest},
+                        'directory_entries -> digest'
+                    );
+                    is(
+                        Git::Database::Object::Tree->new(
+                            backend           => $backend,
+                            directory_entries => $test->{directory_entries}
+                          )->content,
+                        $test->{content},
+                        'directory_entries -> content'
+                    );
+
+                    done_testing;
+                }
+            );
+        }
+    },
 );
 
 done_testing;
