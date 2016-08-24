@@ -36,6 +36,8 @@ sub objects_from {
             $object->{sha1} = $object->{digest};
             $object->{size} = length $object->{content};
             $object->{string} ||= $object->{content};
+            $object->{commit_info}{parents_digest} ||= []
+              if $kind eq 'commit';
         }
     }
 
@@ -134,7 +136,7 @@ my %cmp_for = (
         }
         is(
             join( ' ', @{ $commit_info->{parents_digest} } ),
-            join( ' ', @{ $test->{commit_info}{parents_digest} || [] } ),
+            join( ' ', @{ $test->{commit_info}{parents_digest} } ),
             '= commit_info.parents_digest'
         );
     },
