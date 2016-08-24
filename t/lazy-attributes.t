@@ -257,6 +257,74 @@ test_kind(
             );
         }
     },
+    tag => sub {
+        my ( $backend, $is_empty, @items ) = @_;
+        my $is_reader = $backend->does('Git::Database::Role::ObjectReader');
+
+        for my $test (@items) {
+            subtest(
+                $test->{desc},
+                sub {
+                    # digest
+                    if ( $is_reader && !$is_empty ) {
+                        is(
+                            Git::Database::Object::Tag->new(
+                                backend => $backend,
+                                digest  => $test->{digest}
+                              )->content,
+                            $test->{content},
+                            'digest -> content'
+                        );
+                        is(
+                            Git::Database::Object::Tag->new(
+                                backend => $backend,
+                                digest  => $test->{digest}
+                              )->size,
+                            $test->{size},
+                            'digest -> size'
+                        );
+                        is_deeply(
+                            Git::Database::Object::Tag->new(
+                                backend => $backend,
+                                digest  => $test->{digest}
+                              )->tag_info,
+                            $test->{tag_info},
+                            'digest -> tag_info'
+                        );
+                    }
+
+                    # content
+                    is(
+                        Git::Database::Object::Tag->new(
+                            backend => $backend,
+                            content => $test->{content}
+                          )->digest,
+                        $test->{digest},
+                        'content -> digest'
+                    );
+                    is(
+                        Git::Database::Object::Tag->new(
+                            backend => $backend,
+                            content => $test->{content}
+                          )->size,
+                        $test->{size},
+                        'content -> size'
+                    );
+                    is_deeply(
+                        Git::Database::Object::Tag->new(
+                            backend => $backend,
+                            content => $test->{content}
+                          )->tag_info,
+                        $test->{tag_info},
+                        'content -> tag_info'
+                    );
+
+                    # tag_info
+                    done_testing;
+                }
+            );
+        }
+    },
 );
 
 done_testing;
