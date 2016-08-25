@@ -126,6 +126,15 @@ test_kind(
                     # fetching the object
                     cmp_git_objects( $db->get_object($digest), $test );
 
+                    # create the object with only the digest
+                    cmp_git_objects(
+                        "Git::Database::Object::\u$kind"->new(
+                            backend => $backend,
+                            digest  => $test->{digest},
+                        ),
+                        $test
+                    );
+
                     done_testing;
                 }
             ) if $is_reader && !$is_empty;
