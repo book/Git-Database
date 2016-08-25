@@ -39,7 +39,7 @@ has content => (
     builder => sub {
         my ( $digest, $backend ) = ( $_[0]->digest, $_[0]->backend );
         my $attr = $backend->get_object_attributes($digest);
-        die "$digest not found in $backend" if !$attr;
+        die $_[0]->kind . " $digest not found in $backend" if !$attr;
         return $attr->{content};
     },
     predicate => 1,
