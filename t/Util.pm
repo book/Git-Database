@@ -175,6 +175,39 @@ sub cmp_git_objects {
     $cmp_for{$kind}->( $object, $test ) if exists $cmp_for{$kind};
 }
 
+sub test_backends {
+    my ( $source, $code ) = @_;
+    my @sources =
+        $source
+      ? $source eq '*'
+          ? ( available_bundles() )
+          : ($source)
+      : ('');
+    die "No bundle available for $source"
+      if $source && $source ne '*' && !bundle_for($source);
+
+    # loop over all available backends
+    for my $backend ( available_backends() ) {
+
+        for my $source (@sources) {
+
+            # if we have a .bundle for the repository, connect the backend to it
+            my ( $is_empty, $Backend ) =
+              bundle_for($source)
+              ? ( 0, backend_for( $backend, repository_from($source) ) )
+              : ( 1, backend_for( $backend, empty_repository() ) );
+
+            subtest(
+                "$backend & " . ( $source || '<empty repository>' ),
+                sub {
+                    $code->( $Backend, $is_empty, $source );
+                    done_testing;
+                }
+            );
+        }
+    }
+}
+
 sub test_kind {
     my %code_for = @_ == 1
       ? map +( $_ => $_[0] ), @kinds    # the same coderef for every kind
