@@ -69,6 +69,7 @@ sub empty_repository {
 # build a store from a repository directory
 my %builder_for = (
     'None' => sub { '' },    # ignored by Git::Database::Backend::None
+    'Git::Repository' => sub { Git::Repository->new( work_tree => shift ); },
 );
 
 sub store_for { return $builder_for{ $_[0] }->( $_[1] ); }
@@ -97,6 +98,7 @@ sub available_bundles {
 sub available_backends {
     return 'None',    # always available
       map eval { Module::Runtime::use_module($_) }, qw(
+      Git::Repository
     );
 }
 
