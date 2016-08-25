@@ -36,6 +36,7 @@ test_kind(
     sub {
         my ( $backend, $is_empty, @objects ) = @_;
         my $is_reader = $backend->does('Git::Database::Role::ObjectReader');
+        my $is_writer = $backend->does('Git::Database::Role::ObjectWriter');
 
         # a database for this backend
         my $db = Git::Database->new( backend => $backend );
@@ -55,6 +56,7 @@ test_kind(
                 undef, "Database can't get an object for $sha1" );
         }
 
+        my %nil_contains;
         for my $test (@objects) {
             my ( $kind, $digest, $size ) = @{$test}{qw( kind digest size )};
 
@@ -84,26 +86,47 @@ test_kind(
                 sub {
 
                     # object is not in the empty database
-                    plan skip_all => 'The empty tree is a special case in Git',
+                    plan
+                      skip_all => 'The empty tree is a special case in Git',
                       if $kind eq 'tree'
                       && $digest eq '4b825dc642cb6eb9a060e54bf8d69288fbee4904';
 
-                    # has_object
-                    ok(
-                        !$nil->has_object($digest),
-                        "has_object( $digest ): missing"
-                    );
+                  SKIP: {
+                        skip "$digest has already been added to $backend", 3
+                          if $nil_contains{$digest};
 
-                    # get_object_meta
-                    is_deeply(
-                        [ $nil->get_object_meta($digest) ],
-                        [ $digest, 'missing', undef ],
-                        "get_object_meta( $digest ): missing"
-                    );
+                        # has_object
+                        ok(
+                            !$nil->has_object($digest),
+                            "has_object( $digest ): missing"
+                        );
 
-                    # get_object
-                    is( $nil->get_object($digest),
-                        undef, "get_object( $digest ): missing" );
+                        # get_object_meta
+                        is_deeply(
+                            [ $nil->get_object_meta($digest) ],
+                            [ $digest, 'missing', undef ],
+                            "get_object_meta( $digest ): missing"
+                        );
+
+                        # get_object
+                        is( $nil->get_object($digest),
+                            undef, "get_object( $digest ): missing" );
+                    }
+
+                    # add the object to the database
+                    if ($is_writer) {
+                        is(
+                            $nil->put_object(
+                                "Git::Database::Object::\u$kind"->new(
+                                    content => $test->{content}
+                                )
+                            ),
+                            $digest,
+                            "put_object: $digest"
+                        );
+                        cmp_git_objects( $nil->get_object($digest), $test );
+                        $nil_contains{$digest}++;
+                    }
 
                     done_testing;
                 }
