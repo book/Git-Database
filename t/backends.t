@@ -32,6 +32,9 @@ my %args_for = (
     },
 );
 
+diag "Available backends:";
+diag "- $_" for available_backends();
+
 test_kind(
     sub {
         my ( $backend, $is_empty, @objects ) = @_;
