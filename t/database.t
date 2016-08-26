@@ -19,12 +19,14 @@ for my $backend ( available_backends() ) {
     # provide backend directly
     $db = backend_for( $backend, $dir );
     isa_ok( $db, "Git::Database::Backend::$backend" );
-    isa_ok( $db->store, $backend ) if $backend ne 'None';
+    isa_ok( $db->store, $backend )
+      if $backend ne 'None' && $backend ne 'Git::Sub';
 
     # build backend from store
     $db = Git::Database->new( store => store_for( $backend, $dir ) );
     isa_ok( $db, "Git::Database::Backend::$backend" );
-    isa_ok( $db->store, $backend ) if $backend ne 'None';
+    isa_ok( $db->store, $backend )
+      if $backend ne 'None' && $backend ne 'Git::Sub';
 }
 
 # some error cases
