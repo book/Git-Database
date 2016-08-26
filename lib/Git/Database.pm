@@ -21,6 +21,7 @@ has backend => (
         'get_object',
         'get_hashes',
         'has_object',
+        'all_digests',
         'put_object',         # Git::Database::Role::ObjectWriter
         'resolve_ref',        # Git::Database::Role::RefReader
         'get_refs',
