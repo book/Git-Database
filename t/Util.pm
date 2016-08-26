@@ -71,6 +71,7 @@ sub empty_repository {
 my %builder_for = (
     'None' => sub { '' },    # ignored by Git::Database::Backend::None
     'Git::Repository' => sub { Git::Repository->new( work_tree => shift ); },
+    'Git::Wrapper'    => sub { Git::Wrapper->new( shift ); },
 );
 
 sub store_for { return $builder_for{ $_[0] }->( $_[1] ); }
