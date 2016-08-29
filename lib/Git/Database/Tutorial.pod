@@ -42,6 +42,10 @@ The Perl Git wrapper that reads and write the data from and to the repository.
 
 A store instance is always connected to an actual Git repository.
 
+The only currently supported store is L<Git::Repository>.
+Several branches exist in the development repository to add support for
+other Git wrappers. Patches welcome!
+
 =item object
 
 An object from the Git object database. Represented in Perl by the
