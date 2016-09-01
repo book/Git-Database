@@ -76,7 +76,7 @@ the Git object database maintained by Git.
 
 =head2 backend
 
-A object doing the L<Git::Database::Role::Backend> role, used to access
+An object doing the L<Git::Database::Role::Backend> role, used to access
 the data in the Git repository.
 
 If none is provided, defaults to using the very limited
