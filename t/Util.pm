@@ -97,9 +97,9 @@ sub available_bundles {
 
 sub available_backends {
     return 'None',    # always available
-      map eval { Module::Runtime::use_module($_) }, qw(
-      Git::Repository
-    );
+      map eval { Module::Runtime::use_module($_) },
+      grep !/^None$/,
+      keys %builder_for;
 }
 
 sub bundle_for { return $test_data{ $_[0] }{'.bundle'} }
