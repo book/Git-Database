@@ -70,6 +70,7 @@ sub empty_repository {
 # build a store from a repository directory
 my %builder_for = (
     'None' => sub { '' },    # ignored by Git::Database::Backend::None
+    'Git::PurePerl'   => sub { Git::PurePerl->new( directory   => shift ); },
     'Git::Repository' => sub { Git::Repository->new( work_tree => shift ); },
 );
 
