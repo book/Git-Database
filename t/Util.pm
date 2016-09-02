@@ -178,15 +178,10 @@ sub cmp_git_objects {
 }
 
 sub test_backends {
-    my ( $source, $code ) = @_;
-    my @sources =
-        $source
-      ? $source eq '*'
-          ? ( available_bundles() )
-          : ($source)
-      : ('');
-    die "No bundle available for $source"
-      if $source && $source ne '*' && !bundle_for($source);
+    my ( $code, @sources ) = @_;
+
+    # loop over all bundles if none given
+    @sources = available_bundles() if !@sources;
 
     # loop over all available backends
     for my $backend ( available_backends() ) {

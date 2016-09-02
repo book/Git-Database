@@ -8,7 +8,7 @@ use t::Util;
 my $zero = '0' x 40;
 
 test_backends(
-    '' => sub {
+    sub {
         my ( $backend, $is_empty, $source ) = @_;
         plan
           skip_all => sprintf '%s does not Git::Database::Role::ObjectReader',
@@ -29,7 +29,8 @@ test_backends(
                 '... expected error message'
             );
         }
-    }
+    },
+    ''    # will force an empty repository
 );
 
 done_testing;
