@@ -1,0 +1,8 @@
+Revision history for Git-Database
+
+{{$NEXT}}
+    - Git::Database provides an OO interface to the Git object database
+      (similar to Git::PurePerl, but with a choice of backends for interacting
+      with the Git repositories)
+    - This is still in alpha, and everything is subject to change
+    - The only supported backend for now is Git::Repository
