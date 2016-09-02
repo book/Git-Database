@@ -179,6 +179,8 @@ sub cmp_git_objects {
 
 sub test_backends {
     my ( $code, @sources ) = @_;
+    @sources = ( '', available_bundles() )
+      if @sources == 1 && $sources[0] eq '*';
 
     # loop over all bundles if none given
     @sources = available_bundles() if !@sources;
