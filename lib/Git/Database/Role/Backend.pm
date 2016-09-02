@@ -2,15 +2,17 @@ package Git::Database::Role::Backend;
 
 use Moo::Role;
 
-requires
-  'hash_object',
-  ;
-
 has store => (
     is        => 'ro',
     required  => 1,
     predicate => 1,
 );
+
+sub hash_object {
+    my ( $self, $object ) = @_;
+    return Digest::SHA->new->add( $object->kind, ' ', $object->size, "\0",
+        $object->content )->hexdigest;
+}
 
 1;
 
@@ -31,8 +33,6 @@ Git::Database::Role::Backend - Abstract role for a Git database backend
 
     with 'Git::Database::Role::Backend';
 
-    sub hash_object { ... }
-
     1;
 
 =head1 DESCRIPTION
@@ -48,10 +48,7 @@ a class must at least do this role.
 The L<store|Git::Database::Tutorial/store> that will store and retrieve
 data from the Git repository.
 
-=head1 REQUIRED METHODS
-
-These methods are I<required> by the role, classes consuming this role
-B<must> provide them.
+=head1 METHODS
 
 =head2 hash_object
 
@@ -68,6 +65,9 @@ builder for one of the object classes (L<Git::Database::Object::Blob>,
 L<Git::Database::Object::Tree>, L<Git::Database::Object::Commit>,
 L<Git::Database::Object::Tag>), so the implementation should not try to
 shortcut and call C<< $object->digest >>.
+
+The role provides a Perl implementation for it, but most backends will
+want to override it for performance reasons.
 
 =head1 AUTHOR
 

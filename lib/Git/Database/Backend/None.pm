@@ -15,13 +15,6 @@ has '+store' => (
     predicate => 1,
 );
 
-sub hash_object {
-    my ( $self, $object ) = @_;
-    my $sha1 = Digest::SHA->new;
-    $sha1->add( $object->kind, ' ', $object->size, "\0", $object->content );
-    $sha1->hexdigest;
-}
-
 1;
 
 __END__
@@ -57,7 +50,8 @@ because it doesn't have one.
 
 Since it's not connected to a store, this class can't delegate the
 L<digest|Git::Database::Role::Object/digest> computation to Git itself. It
-therefore provides a Perl implementation for it.
+therefore uses the default implementation provided by
+L<Git::Database::Role::Backend>.
 
 =head1 AUTHOR
 
