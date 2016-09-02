@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 use Test::More;
+use List::Util qw( uniq );
 use Git::Database;
 
 use t::Util;
@@ -167,6 +168,39 @@ test_kind(
 
         }
     }
+);
+
+# all_digests
+test_backends(
+    sub {
+        my ( $backend, $is_empty, $source ) = @_;
+        plan
+          skip_all => sprintf '%s does not Git::Database::Role::ObjectReader',
+          ref $backend
+          if !$backend->does('Git::Database::Role::ObjectReader');
+
+        if ($is_empty) {
+            is_deeply( [ $backend->all_digests ],
+                [], "Empty repository contains no digests" );
+            return;
+        }
+
+        my $objects = objects_from($source);
+        my %digests =
+          map +( $_ => [ uniq sort map $_->{digest}, @{ $objects->{$_} } ] ),
+          sort keys %$objects;
+
+        is_deeply( [ $backend->all_digests($_) ],
+            $digests{$_}, "all_digests( $_ )" )
+          for sort keys %digests;
+
+        is_deeply(
+            [ $backend->all_digests ],
+            [ sort map @$_, values %digests ],
+            'all_digests( )'
+        );
+    },
+    '*'    # all bundles, and an empty repository
 );
 
 done_testing;
