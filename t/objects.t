@@ -5,6 +5,8 @@ use Git::Database;
 
 use t::Util;
 
+my $zero = '0' x 40;
+
 test_backends(
     '' => sub {
         my ( $backend, $is_empty, $source ) = @_;
@@ -17,10 +19,10 @@ test_backends(
         for my $kind (qw( blob tree commit tag )) {
             my $object = "Git::Database::Object::\u$kind"->new(
                 backend => $backend,
-                digest  => '0' x 40
+                digest  => $zero,
             );
             ok( !eval { $object->content },
-                "$kind " . '0' x 40 . " not found in $backend" );
+                "$kind $zero not found in $backend" );
             like(
                 $@,
                 qr/^$kind 0{40} not found in \Q$backend\E /,
