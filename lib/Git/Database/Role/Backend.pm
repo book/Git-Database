@@ -7,8 +7,9 @@ requires
   ;
 
 has store => (
-    is       => 'ro',
-    required => 1,
+    is        => 'ro',
+    required  => 1,
+    predicate => 1,
 );
 
 1;

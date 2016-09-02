@@ -7,10 +7,12 @@ use namespace::clean;
 
 with 'Git::Database::Role::Backend';
 
+# we don't have a backend
 has '+store' => (
-    is       => 'ro',
-    required => 0,
-    init_arg => undef,
+    is        => 'ro',
+    required  => 0,
+    init_arg  => undef,
+    predicate => 1,
 );
 
 sub hash_object {
