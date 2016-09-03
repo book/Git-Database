@@ -33,6 +33,7 @@ sub objects_from {
     for my $kind ( keys %$objects ) {
         for my $object ( @{ $objects->{$kind} } ) {
             $object->{kind} = $kind;
+            $object->{desc} ||= join ' ', $object->{kind}, $object->{digest};
             $object->{sha1} = $object->{digest};
             $object->{size} = length $object->{content};
             $object->{string} ||= $object->{content};
