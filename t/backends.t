@@ -199,6 +199,11 @@ test_backends(
             [ sort map @$_, values %digests ],
             'all_digests( )'
         );
+
+        # one known case of ambiguous abbreviated digest
+        is( $backend->get_object('577ecc'),
+            undef, "get_object( ambiguous ) fails" )
+          if $source eq 'ambiguous';
     },
     '*'    # all bundles, and an empty repository
 );
