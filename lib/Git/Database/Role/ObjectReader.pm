@@ -67,11 +67,11 @@ value that is returned is its "kind".
 =head2 get_object
 
     # a Git::Database::Object::Tree representing the empty tree
-    $tree = $r->get_object('4b825dc642cb6eb9a060e54bf8d69288fbee4904');
-    $tree = $r->get_object('4b825d');    # idem
+    $tree = $backend->get_object('4b825dc642cb6eb9a060e54bf8d69288fbee4904');
+    $tree = $backend->get_object('4b825d');    # idem
 
     # undef
-    $tree = $r->get_object('123456');
+    $tree = $backend->get_object('123456');
 
 Given a digest value (possibly abbreviated), C<get_object>
 returns the full object extracted from the Git database (one of
