@@ -54,7 +54,11 @@ sub is_submodule  { $_[0]->mode eq '160000' }
 
 __END__
 
-# ABSTRACT: A directory entry in Git
+=pod
+
+=head1 NAME
+
+Git::Database::DirectoryEntry - A directory entry in Git
 
 =head1 SYNOPSIS
 

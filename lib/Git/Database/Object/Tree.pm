@@ -66,9 +66,13 @@ sub as_string {
 
 1;
 
-# ABSTRACT: A tree object in the Git object database
+=pod
 
-=for Pod::Coverage::TrustPod BUILD
+=for Pod::Coverage BUILD
+
+=head1 NAME
+
+Git::Database::Object::Tree - A tree object in the Git object database
 
 =head1 SYNOPSIS
 

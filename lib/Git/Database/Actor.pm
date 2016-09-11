@@ -18,7 +18,11 @@ sub ident { $_[0]->name . ' <' . $_[0]->email . '>' }
 
 __END__
 
-# ABSTRACT: An actor in Git::Database
+=pod
+
+=head1 NAME
+
+Git::Database::Actor - An actor in Git::Database
 
 =head1 SYNOPSIS
 

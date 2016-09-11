@@ -114,9 +114,13 @@ sub _build_commit_info {
 
 1;
 
-# ABSTRACT: A commit object in the Git object database
+__END__
 
-=for Pod::Coverage::TrustPod BUILD
+=pod
+
+=head1 NAME
+
+Git::Database::Object::Commit - A commit object in the Git object database
 
 =head1 SYNOPSIS
 

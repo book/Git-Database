@@ -8,7 +8,13 @@ sub kind { 'blob' }
 
 1;
 
-# ABSTRACT: A blob object in the Git object database
+__END__
+
+=pod
+
+=head1 NAME
+
+Git::Database::Object::Blob - A blob object in the Git object database
 
 =head1 SYNOPSIS
 

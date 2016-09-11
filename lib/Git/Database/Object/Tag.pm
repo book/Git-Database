@@ -82,7 +82,13 @@ sub _build_content {
 
 1;
 
-# ABSTRACT: A tag object in the Git database
+__END__
+
+=pod
+
+=head1 NAME
+
+Git::Database::Object::Tag - A tag object in the Git database
 
 =head1 SYNOPSIS
 
