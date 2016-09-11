@@ -101,9 +101,7 @@ L<commit_info|Git::Database::Object::Commit/commit_info>, and
 L<tag_info|Git::Database::Object::Tag/tag_info>.
 
 For now, as soon as the L</content> of a Git::Database::Role::Object is
-needed, it is fully loaded in memory. In future releases, it is planned
-to add a feature where the content is available via a filehandle, so that
-it's never needed to have the whole object content in memory.
+needed, it is fully loaded in memory.
 
 =head2 backend
 
