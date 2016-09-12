@@ -345,9 +345,16 @@ test_backends(
 
         for my $kind (qw( blob tree commit tag )) {
 
+            ok( !eval { "Git::Database::Object::\u$kind"->new(); } );
+            my $err =
+                "One of 'digest' or 'content' "
+              . ( $extra{$kind} ? "or '$extra{$kind}' " : '' )
+              . "is required ";
+            like( $@, qr/^$err/, '... expected error message' );
+
             # pick some random sha1
             my $sha1 = join '', map sprintf( '%02x', rand 256 ), 1 .. 20;
-            my $err  = qr/^$kind $sha1 not found in \Q$backend\E /;
+            $err  = qr/^$kind $sha1 not found in \Q$backend\E /;
             my $obj  = "Git::Database::Object::\u$kind"->new(
                 digest  => $sha1,
                 backend => $backend
