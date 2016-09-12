@@ -327,4 +327,45 @@ test_kind(
     },
 );
 
+# additional attributes for the various kinds
+my %extra = (
+    tree   => 'directory_entries',
+    commit => 'commit_info',
+    tag    => 'tag_info',
+);
+
+# building attributes for an unknown object fails
+test_backends(
+    sub {
+        my ( $backend, $is_empty, $source ) = @_;
+        plan
+          skip_all => sprintf '%s does not Git::Database::Role::ObjectReader',
+          ref $backend
+          if !$backend->does('Git::Database::Role::ObjectReader');
+
+        for my $kind (qw( blob tree commit tag )) {
+
+            # pick some random sha1
+            my $sha1 = join '', map sprintf( '%02x', rand 256 ), 1 .. 20;
+            my $err  = qr/^$kind $sha1 not found in \Q$backend\E /;
+            my $obj  = "Git::Database::Object::\u$kind"->new(
+                digest  => $sha1,
+                backend => $backend
+            );
+
+            ok( !eval { $obj->content }, "$kind content not found" );
+            like( $@, $err, '... expected error message' );
+
+            ok( !eval { $obj->size }, "$kind size not found" );
+            like( $@, $err, '... expected error message' );
+
+            if ( my $attr = $extra{$kind} ) {
+                ok( !eval { $obj->$attr }, "$kind $attr not found" );
+                like( $@, $err, '... expected error message' );
+            }
+        }
+    },
+    ''    # empty repository
+);
+
 done_testing;
