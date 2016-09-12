@@ -78,10 +78,10 @@ database.
 When creating a new object meant to be added to the Git object database
 (via L<backend>), only the L</content> attribute is actually required.
 
-New objects are typically created via L<Git::Database>'s
-L<create_object|Git::Database/create_object> method, rathen than by
-calling C<new> directly. This is when the object data is fetched from
-the Git object database.
+New objects are typically created via L<Git::Database::Role::ObjectReader>'s
+L<get_object|Git::Database::Role::ObjectReader/get_object> method,
+rathen than by calling C<new> directly. This is when the object data is
+fetched from the Git object database.
 
 =head1 ATTRIBUTES
 
