@@ -16,6 +16,12 @@ has commit_info => (
     predicate => 1,
 );
 
+sub BUILD {
+    my ($self) = @_;
+    die "One of 'digest' or 'content' or 'commit_info' is required"
+      if !$self->has_digest && !$self->has_content && !$self->has_commit_info;
+}
+
 for my $attr (
     qw(
     tree_digest

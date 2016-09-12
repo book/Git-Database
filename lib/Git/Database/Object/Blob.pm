@@ -6,6 +6,12 @@ with 'Git::Database::Role::Object';
 
 sub kind { 'blob' }
 
+sub BUILD {
+    my ($self) = @_;
+    die "One of 'digest' or 'content' is required"
+      if !$self->has_digest && !$self->has_content;
+}
+
 1;
 
 __END__

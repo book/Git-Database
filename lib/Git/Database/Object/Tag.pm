@@ -16,6 +16,12 @@ has tag_info => (
     predicate => 1,
 );
 
+sub BUILD {
+    my ($self) = @_;
+    die "One of 'digest' or 'content' or 'tag_info' is required"
+      if !$self->has_digest && !$self->has_content && !$self->has_tag_info;
+}
+
 for my $attr (
     qw(
     object

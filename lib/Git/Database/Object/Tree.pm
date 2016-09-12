@@ -19,6 +19,11 @@ has directory_entries => (
 sub BUILD {
     my ($self) = @_;
 
+    die "One of 'digest' or 'content' or 'directory_entries' is required"
+      if !$self->has_digest
+      && !$self->has_content
+      && !$self->has_directory_entries;
+
     # sort directory entries
     $self->_set_directory_entries(
         [   sort { $a->filename cmp $b->filename }
