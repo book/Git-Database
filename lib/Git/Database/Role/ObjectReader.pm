@@ -45,7 +45,26 @@ Git::Database::Role::ObjectReader - Abstract role for a Git database backend
 
 =head1 SYNOPSIS
 
+    package MyGitBackend;
+
+    use Moo;
+    use namespace::clean;
+
+    with
+      'Git::Database::Role::Backend',
+      'Git::Database::Role::ObjectReader';
+
+    # implement the required methods
+    sub get_object_meta       { ... }
+    sub get_object_attributes { ... }
+    sub all_digests           { ... }
+
 =head1 DESCRIPTION
+
+A L<backend|Git::Database::Role::Backend> doing the additional
+Git::Database::Role::ObjectReader role is capabale of reading data from
+a Git repository to produce L<objects|Git::Database::Role::Object> or
+return information about them.
 
 =head1 METHODS
 
