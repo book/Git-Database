@@ -20,6 +20,9 @@ __END__
 
 =pod
 
+=for Pod::Coverage
+  has_store
+
 =head1 NAME
 
 Git::Database::Role::Backend - Abstract role for a Git database backend
@@ -47,6 +50,8 @@ a class must at least do this role.
 
 The L<store|Git::Database::Tutorial/store> that will store and retrieve
 data from the Git repository.
+
+There is a C<has_store> predicate method for this attribute.
 
 =head1 METHODS
 

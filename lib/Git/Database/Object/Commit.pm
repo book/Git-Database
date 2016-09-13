@@ -126,6 +126,7 @@ __END__
 
 =for Pod::Coverage
   BUILD
+  has_commit_info
 
 =head1 NAME
 
@@ -149,6 +150,9 @@ Git::Database::Object::Commit represents a C<commit> object
 obtained via L<Git::Database> from a Git object database.
 
 =head1 ATTRIBUTES
+
+All major attributes (L</digest>, L</content>, L</size>, L</commit_info>)
+have a predicate method.
 
 =head2 kind
 

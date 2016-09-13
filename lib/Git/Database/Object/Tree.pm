@@ -75,6 +75,7 @@ sub as_string {
 
 =for Pod::Coverage
   BUILD
+  has_directory_entries
 
 =head1 NAME
 
@@ -96,6 +97,8 @@ Git::Database::Object::Tree represents a C<tree> object
 obtained via L<Git::Database> from a Git object database.
 
 =head1 ATTRIBUTES
+
+All attributes have a predicate method.
 
 =head2 kind
 

@@ -94,6 +94,7 @@ __END__
 
 =for Pod::Coverage
   BUILD
+  has_tag_info
 
 =head1 NAME
 
@@ -117,6 +118,9 @@ Git::Database::Object::Tag represents a C<tag> object
 obtained via L<Git::Database> from a Git object database.
 
 =head1 ATTRIBUTES
+
+All major attributes (L</digest>, L</content>, L</size>, L</tag_info>)
+have a predicate method.
 
 =head2 kind
 

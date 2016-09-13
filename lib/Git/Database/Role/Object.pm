@@ -53,6 +53,12 @@ __END__
 
 =pod
 
+=for Pod::Coverage
+  has_backend
+  has_content
+  has_digest
+  has_size
+
 =head1 NAME
 
 Git::Database::Role::Object - Role for objects from the Git object database
@@ -88,7 +94,7 @@ fetched from the Git object database.
 The L<content>, L<size> and L<digest> attribute are lazy, and can be
 computed from the others: L<size> from L<content>, L<content> from
 L<digest> (if the object exists in the backend store), and L<digest>
-from L<content>.
+from L<content>. All attributes have a predicate method.
 
 Additional attributes in some classes may add other ways to compute
 the content.
