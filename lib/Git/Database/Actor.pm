@@ -1,6 +1,7 @@
 package Git::Database::Actor;
 
 use Moo;
+use namespace::clean;
 
 has name => (
     is       => 'ro',

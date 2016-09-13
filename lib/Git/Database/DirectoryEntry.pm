@@ -1,7 +1,9 @@
 package Git::Database::DirectoryEntry;
 
-use Moo;
 use Sub::Quote;
+
+use Moo;
+use namespace::clean;
 
 # Git only uses the following (octal) modes:
 # - 040000 for subdirectory (tree)

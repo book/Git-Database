@@ -1,6 +1,7 @@
 package Git::Database::Object::Blob;
 
 use Moo;
+use namespace::clean;
 
 with 'Git::Database::Role::Object';
 

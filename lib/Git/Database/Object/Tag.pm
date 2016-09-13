@@ -1,12 +1,13 @@
 package Git::Database::Object::Tag;
 
-use Moo;
-
-with 'Git::Database::Role::Object';
-
 use Git::Database::Actor;
 use DateTime;
 use Encode qw( decode );
+
+use Moo;
+use namespace::clean;
+
+with 'Git::Database::Role::Object';
 
 sub kind {'tag'}
 
