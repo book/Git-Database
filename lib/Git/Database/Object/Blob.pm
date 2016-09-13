@@ -18,6 +18,9 @@ __END__
 
 =pod
 
+=for Pod::Coverage
+  BUILD
+
 =head1 NAME
 
 Git::Database::Object::Blob - A blob object in the Git object database

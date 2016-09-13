@@ -73,7 +73,8 @@ sub as_string {
 
 =pod
 
-=for Pod::Coverage BUILD
+=for Pod::Coverage
+  BUILD
 
 =head1 NAME
 

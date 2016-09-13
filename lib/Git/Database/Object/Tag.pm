@@ -92,6 +92,9 @@ __END__
 
 =pod
 
+=for Pod::Coverage
+  BUILD
+
 =head1 NAME
 
 Git::Database::Object::Tag - A tag object in the Git database

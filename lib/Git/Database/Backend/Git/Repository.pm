@@ -124,6 +124,11 @@ sub DEMOLISH {
 
 __END__
 
+=pod
+
+=for Pod::Coverage
+  DEMOLISH
+
 =head1 NAME
 
 Git::Database::Backend::Git::Repository - A Git::Database backend based on Git::Repository

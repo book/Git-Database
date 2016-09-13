@@ -50,6 +50,9 @@ __END__
 
 =pod
 
+=for Pod::Coverage
+  BUILDARGS
+
 =head1 NAME
 
 Git::Database - Provide access to the Git object database
