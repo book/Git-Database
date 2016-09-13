@@ -150,6 +150,13 @@ Git::Database::Backend::Git::Repository - A Git::Database backend based on Git::
 This backend reads and write data from a Git repository using the
 L<Git::Repository> Git wrapper.
 
+=head2 Git Database Roles
+
+This backend does the following roles
+(check their documentation for a list of supported methods):
+L<Git::Database::Role::Backend>,
+L<Git::Database::Role::ObjectReader>.
+
 =head1 AUTHOR
 
 Philippe Bruhat (BooK) <book@cpan.org>
