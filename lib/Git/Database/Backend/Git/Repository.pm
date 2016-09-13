@@ -127,7 +127,13 @@ __END__
 =pod
 
 =for Pod::Coverage
+  has_object_checker
+  has_object_factory
   DEMOLISH
+  hash_object
+  get_object_attributes
+  get_object_meta
+  all_digests
 
 =head1 NAME
 
