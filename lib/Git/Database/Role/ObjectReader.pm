@@ -8,7 +8,6 @@ use Git::Database::Object::Tag;
 use Moo::Role;
 
 requires
-  'get_object_meta',
   'get_object_attributes',
   'all_digests',
   ;
@@ -17,6 +16,15 @@ sub has_object {
     my ( $self, $digest ) = @_;
     my ( $sha1, $kind, $size ) = $self->get_object_meta($digest);
     return $kind eq 'missing' ? '' : $kind;
+}
+
+sub get_object_meta {
+    my ( $self, $digest ) = @_;
+
+    my $attr = $self->get_object_attributes($digest);
+    return $attr
+      ? ( @{$attr}{qw( digest kind size )} )
+      : ( $digest, 'missing', undef );
 }
 
 my %kind2class = (
@@ -55,7 +63,6 @@ Git::Database::Role::ObjectReader - Abstract role for a Git database backend
       'Git::Database::Role::ObjectReader';
 
     # implement the required methods
-    sub get_object_meta       { ... }
     sub get_object_attributes { ... }
     sub all_digests           { ... }
 
@@ -99,8 +106,6 @@ L<Git::Database::Object::Commit>, or L<Git::Database::Object::Tag>).
 
 Returns C<undef> if the object is not in the Git database.
 
-=head1 REQUIRED METHODS
-
 =head2 get_object_meta
 
     # ( '4b825dc642cb6eb9a060e54bf8d69288fbee4904', 'tree', 0 );
@@ -115,6 +120,11 @@ object is in the database).
 
 Otherwise it returns the requested C<$digest>, the string C<missing>
 and the C<undef> value.
+
+The default implementation is written using L</get_object_attributes>.
+Backend writers may want to implement their own for performance reasons.
+
+=head1 REQUIRED METHODS
 
 =head2 get_object_attributes
 
