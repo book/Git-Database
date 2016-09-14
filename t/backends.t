@@ -6,6 +6,8 @@ use Git::Database;
 
 use t::Util;
 
+our @kinds;    # set by t::Util
+
 # different object kinds work with different possible arguments
 my %args_for = (
     blob => sub {
@@ -188,7 +190,7 @@ test_backends(
         my $objects = objects_from($source);
         my %digests =
           map +( $_ => [ uniq sort map $_->{digest}, @{ $objects->{$_} } ] ),
-          sort keys %$objects;
+          @kinds;
 
         is_deeply( [ $backend->all_digests($_) ],
             $digests{$_}, "all_digests( $_ )" )

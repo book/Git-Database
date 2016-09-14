@@ -16,7 +16,7 @@ use Git::Database::Object::Tag;
 
 use Git::Database::Backend::None;
 
-my @kinds = qw( blob tree commit tag );
+our @kinds = qw( blob tree commit tag );
 
 # all the following functions will end up in the caller's namespace
 
