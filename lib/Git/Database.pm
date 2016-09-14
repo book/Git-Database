@@ -23,8 +23,7 @@ has backend => (
         'has_object',
         'all_digests',
         'put_object',         # Git::Database::Role::ObjectWriter
-        'resolve_ref',        # Git::Database::Role::RefReader
-        'get_refs',
+        'refs',               # Git::Database::Role::RefReader
         'put_ref',            # Git::Database::Role::RefWriter
         'delete_ref'
     ],
