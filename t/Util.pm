@@ -30,7 +30,7 @@ sub objects_from {
     my $objects = do $perl;
 
     # add extra information
-    for my $kind ( keys %$objects ) {
+    for my $kind ( @kinds ) {
         for my $object ( @{ $objects->{$kind} } ) {
             $object->{kind} = $kind;
             $object->{desc} ||= join ' ', $object->{kind}, $object->{digest};
