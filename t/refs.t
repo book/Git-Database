@@ -25,6 +25,12 @@ test_backends(
             "ref_names('heads')"
         );
 
+        is_deeply(
+            [ $backend->ref_names('remotes/origin') ],
+            [ sort grep m{^refs/remotes/origin/}, keys %$refs ],
+            "ref_names('remotes/origin')"
+        );
+
         is( $backend->ref_digest($_), $refs->{$_}, "ref_digest('$_')" )
           for (qw( HEAD refs/heads/master refs/remotes/origin/master nil ));
     }
