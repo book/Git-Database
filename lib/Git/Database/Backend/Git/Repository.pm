@@ -35,12 +35,14 @@ has object_checker => (
     clearer   => 1,
 );
 
+# Git::Database::Role::Backend
 sub hash_object {
     my ($self, $object ) = @_;
     return scalar $self->store->run( 'hash-object', '-t', $object->kind,
         '--stdin', { input => $object->content } );
 }
 
+# Git::Database::Role::ObjectReader
 sub get_object_meta {
     my ( $self, $digest ) = @_;
     my $checker = $self->object_checker;
@@ -113,6 +115,7 @@ sub all_digests {
       $self->store->run(qw( cat-file --batch-check --batch-all-objects ));
 }
 
+# Git::Database::Role::ObjectWriter
 sub put_object {
     my ( $self, $object ) = @_;
     return scalar $self->store->run( 'hash-object', '-t', $object->kind,
