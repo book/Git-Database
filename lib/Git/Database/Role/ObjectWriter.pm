@@ -33,7 +33,7 @@ Git::Database::Role::ObjectWriter - Abstract role for a Git database backend
 =head1 DESCRIPTION
 
 A L<backend|Git::Database::Role::Backend> doing the additional
-Git::Database::Role::ObjectWriter role is capabale of writing the
+Git::Database::Role::ObjectWriter role is capable of writing the
 data from L<objects|Git::Database::Role::Object> to the attached Git
 repository.
 
