@@ -155,6 +155,10 @@ L<Git::Database::Object::Tree>,
 L<Git::Database::Object::Commit>,
 L<Git::Database::Object::Tag>.
 
+=head1 AUTHOR
+
+Philippe Bruhat (BooK) <book@cpan.org>.
+
 =head1 COPYRIGHT
 
 Copyright 2013-2016 Philippe Bruhat (BooK), all rights reserved.

@@ -50,6 +50,10 @@ Given an L<object|Git::Database::Role::Object>, C<put_object> will write
 the data for the object in the underlying repository database, and
 return the digest for the object.
 
+=head1 AUTHOR
+
+Philippe Bruhat (BooK) <book@cpan.org>.
+
 =head1 COPYRIGHT
 
 Copyright 2016 Philippe Bruhat (BooK), all rights reserved.

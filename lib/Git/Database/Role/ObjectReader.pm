@@ -158,6 +158,10 @@ Return all the digests contained in the Git object database.
 If a L<kind|Git::Database::Role::Object/kind> argument is provided,
 only return the digests for that specific object kind.
 
+=head1 AUTHOR
+
+Philippe Bruhat (BooK) <book@cpan.org>.
+
 =head1 COPYRIGHT
 
 Copyright 2016 Philippe Bruhat (BooK), all rights reserved.

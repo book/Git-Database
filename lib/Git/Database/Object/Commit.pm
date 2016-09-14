@@ -231,9 +231,13 @@ C<committed_time>, C<comment>, and C<encoding> (optional).
 L<Git::Database>,
 L<Git::Database::Role::Object>.
 
+=head1 AUTHOR
+
+Philippe Bruhat (BooK) <book@cpan.org>.
+
 =head1 COPYRIGHT
 
-Copyright 2013 Philippe Bruhat (BooK), all rights reserved.
+Copyright 2013-2016 Philippe Bruhat (BooK), all rights reserved.
 
 =head1 LICENSE
 

@@ -59,4 +59,17 @@ The identity of the actor, build as:
 
     Name <email>
 
+=head1 AUTHOR
+
+Philippe Bruhat (BooK) <book@cpan.org>.
+
+=head1 COPYRIGHT
+
+Copyright 2013-2016 Philippe Bruhat (BooK), all rights reserved.
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
 =cut
