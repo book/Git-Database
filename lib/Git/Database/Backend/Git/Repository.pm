@@ -10,6 +10,7 @@ with
   'Git::Database::Role::ObjectReader',
   'Git::Database::Role::ObjectWriter',
   'Git::Database::Role::RefReader',
+  'Git::Database::Role::RefWriter',
   ;
 
 has '+store' => (
@@ -132,6 +133,17 @@ sub refs {
     };
 }
 
+# Git::Database::Role::RefWriter
+sub put_ref {
+    my ($self, $refname, $digest ) = @_;
+    $self->store->run( 'update-ref', $refname, $digest );
+}
+
+sub delete_ref {
+    my ($self, $refname ) = @_;
+    $self->store->run( 'update-ref', '-d', $refname );
+}
+
 sub DEMOLISH {
     my ( $self, $in_global_destruction ) = @_;
     return if $in_global_destruction;    # why bother?
@@ -156,6 +168,8 @@ __END__
   all_digests
   put_object
   refs
+  put_ref
+  delete_ref
 
 =head1 NAME
 
