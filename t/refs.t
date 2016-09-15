@@ -33,6 +33,18 @@ test_backends(
 
         is( $backend->ref_digest($_), $refs->{$_}, "ref_digest('$_')" )
           for (qw( HEAD refs/heads/master refs/remotes/origin/master nil ));
+
+        if ( $backend->does('Git::Database::Role::RefWriter') ) {
+
+            $backend->put_ref( 'refs/heads/master-tmp',
+                $refs->{'refs/heads/master'} );
+            is( $backend->ref_digest('refs/heads/master-tmp'),
+                $refs->{'refs/heads/master'}, 'put_ref' );
+
+            $backend->delete_ref('refs/heads/master-tmp');
+            is( $backend->ref_digest('refs/heads/master-tmp'),
+                undef, 'delete_ref' );
+        }
     }
 );
 
