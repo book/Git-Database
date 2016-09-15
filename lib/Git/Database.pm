@@ -6,6 +6,19 @@ use Module::Runtime qw( use_module );
 use Moo;
 use namespace::clean;
 
+my %role_for = (
+    hash_object           => 'Git::Database::Role::Backend',
+    get_object_meta       => 'Git::Database::Role::ObjectReader',
+    get_object_attributes => 'Git::Database::Role::ObjectReader',
+    get_object            => 'Git::Database::Role::ObjectReader',
+    has_object            => 'Git::Database::Role::ObjectReader',
+    all_digests           => 'Git::Database::Role::ObjectReader',
+    put_object            => 'Git::Database::Role::ObjectWriter',
+    refs                  => 'Git::Database::Role::RefReader',
+    put_ref               => 'Git::Database::Role::RefWriter',
+    delete_ref            => 'Git::Database::Role::RefWriter',
+);
+
 has backend => (
     is       => 'ro',
     required => 1,
@@ -14,19 +27,7 @@ has backend => (
         die "$_[0] DOES not Git::Database::Role::Backend"
           if !eval { $_[0]->does('Git::Database::Role::Backend') };
     },
-    handles => [
-        'hash_object',        # Git::Database::Role::Backend
-        'get_object_meta',    # Git::Database::Role::ObjectReader
-        'get_object_attributes',
-        'get_object',
-        'get_hashes',
-        'has_object',
-        'all_digests',
-        'put_object',         # Git::Database::Role::ObjectWriter
-        'refs',               # Git::Database::Role::RefReader
-        'put_ref',            # Git::Database::Role::RefWriter
-        'delete_ref'
-    ],
+    handles => [ keys %role_for ],
 );
 
 sub BUILDARGS {
