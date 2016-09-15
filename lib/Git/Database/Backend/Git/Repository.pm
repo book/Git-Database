@@ -8,6 +8,7 @@ use namespace::clean;
 with
   'Git::Database::Role::Backend',
   'Git::Database::Role::ObjectReader',
+  'Git::Database::Role::ObjectWriter',
   ;
 
 has '+store' => (
@@ -112,6 +113,12 @@ sub all_digests {
       $self->store->run(qw( cat-file --batch-check --batch-all-objects ));
 }
 
+sub put_object {
+    my ( $self, $object ) = @_;
+    return scalar $self->store->run( 'hash-object', '-t', $object->kind,
+        '-w', '--stdin', { input => $object->content } );
+}
+
 sub DEMOLISH {
     my ( $self, $in_global_destruction ) = @_;
     return if $in_global_destruction;    # why bother?
@@ -134,6 +141,7 @@ __END__
   get_object_attributes
   get_object_meta
   all_digests
+  put_object
 
 =head1 NAME
 
@@ -161,7 +169,8 @@ L<Git::Repository> Git wrapper.
 This backend does the following roles
 (check their documentation for a list of supported methods):
 L<Git::Database::Role::Backend>,
-L<Git::Database::Role::ObjectReader>.
+L<Git::Database::Role::ObjectReader>,
+L<Git::Database::Role::ObjectWriter>.
 
 =head1 AUTHOR
 
