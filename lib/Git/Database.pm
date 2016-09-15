@@ -44,6 +44,15 @@ sub BUILDARGS {
     return $args;
 }
 
+around can => sub {
+    my $orig = shift;
+    my ( $invocant, $name ) = @_;
+    return ref $invocant                                # object
+      && exists $role_for{$name}                        # known delegated method
+      && !$invocant->backend->does( $role_for{$name} )  # no backend support
+      ? undef : $orig->(@_);
+};
+
 1;
 
 __END__
