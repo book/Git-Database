@@ -1,57 +1,34 @@
 package Git::Database;
 
-use Sub::Quote;
 use Module::Runtime qw( use_module );
 
 use Moo;
 use namespace::clean;
 
-my %role_for = (
-    hash_object           => 'Git::Database::Role::Backend',
-    get_object_meta       => 'Git::Database::Role::ObjectReader',
-    get_object_attributes => 'Git::Database::Role::ObjectReader',
-    get_object            => 'Git::Database::Role::ObjectReader',
-    has_object            => 'Git::Database::Role::ObjectReader',
-    all_digests           => 'Git::Database::Role::ObjectReader',
-    put_object            => 'Git::Database::Role::ObjectWriter',
-    refs                  => 'Git::Database::Role::RefReader',
-    put_ref               => 'Git::Database::Role::RefWriter',
-    delete_ref            => 'Git::Database::Role::RefWriter',
-);
-
-has backend => (
-    is       => 'ro',
-    required => 1,
-    default  => sub { use_module('Git::Database::Backend::None')->new; },
-    isa      => sub {
-        die "$_[0] DOES not Git::Database::Role::Backend"
-          if !eval { $_[0]->does('Git::Database::Role::Backend') };
-    },
-    handles => [ keys %role_for ],
-);
-
-sub BUILDARGS {
+sub new {
     my $args = Moo::Object::BUILDARGS(@_);
 
-    die "'store' and 'backend' attributes are mutually exclusive"
-      if exists $args->{store} && exists $args->{backend};
-
+    # store: an object that gives actual access to a git repo
     if ( my $store = delete $args->{store} ) {
-        $args->{backend} = use_module( "Git::Database::Backend::" . ref $store )
+
+        # should be the sole attribute
+        my @nope = grep exists $args->{$_}, qw( backend );
+        local $" = "', '";
+        die "'store' is incompatible with '@nope'" if @nope;
+
+        return use_module( "Git::Database::Backend::" . ref $store )
           ->new( store => $store );
     }
 
-    return $args;
-}
+    # pass the backend attribute through
+    if ( my $backend = delete $args->{backend} ) {
+        die "$backend DOES not Git::Database::Role::Backend"
+          if !eval { $backend->does('Git::Database::Role::Backend') };
+        return $backend;
+    }
 
-around can => sub {
-    my $orig = shift;
-    my ( $invocant, $name ) = @_;
-    return ref $invocant                                # object
-      && exists $role_for{$name}                        # known delegated method
-      && !$invocant->backend->does( $role_for{$name} )  # no backend support
-      ? undef : $orig->(@_);
-};
+    return use_module('Git::Database::Backend::None')->new;
+}
 
 1;
 

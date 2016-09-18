@@ -24,19 +24,22 @@ test_backends(
         my $db = Git::Database->new( backend => $backend );
 
         # stuff we're sure of
-        ok( $db->can('backend'), "can( backend )" );
-        ok( ! $db->can('zlonk'), "cant'( zlonk )" );
+        ok(
+            $db->does('Git::Database::Role::Backend'),
+            "does Git::Database::Role::Backend"
+        );
+        ok( !$db->can('zlonk'), "cant'( zlonk )" );
 
         for my $role ( sort keys %methods_for ) {
-            if($db->backend->does( $role ) ) {
+            if ( $db->does($role) ) {
                 ok( $db->can($_), "can( $_ )" ) for @{ $methods_for{$role} };
             }
-            else{ 
+            else {
                 ok( !$db->can($_), "can't( $_ )" ) for @{ $methods_for{$role} };
             }
         }
     },
-    '', # test each backend once, with an empty repository
+    '',    # test each backend once, with an empty repository
 );
 
 done_testing;
