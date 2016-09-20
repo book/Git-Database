@@ -85,6 +85,15 @@ sub put_object {
 
 __END__
 
+=pod
+
+=for Pod::Coverage
+  hash_object
+  get_object_attributes
+  get_object_meta
+  all_digests
+  put_object
+
 =head1 NAME
 
 Git::Database::Backend::Git::PurePerl - A Git::Database backend based on Git::PurePerl
