@@ -16,10 +16,4 @@ has '+store' => (
     } ),
 );
 
-sub hash_object {
-    my ( $self, $object ) = @_;
-    return Digest::SHA->new->add( $object->kind, ' ', $object->size, "\0",
-        $object->content )->hexdigest;
-}
-
 1;
