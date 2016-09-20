@@ -8,6 +8,7 @@ use namespace::clean;
 with
   'Git::Database::Role::Backend',
   'Git::Database::Role::ObjectReader',
+  'Git::Database::Role::ObjectWriter',
   ;
 
 has '+store' => (
@@ -62,6 +63,24 @@ sub all_digests {
     return map $_->sha1, grep $_->kind eq $kind, $self->store->all_objects->all;
 }
 
+sub put_object {
+    my ( $self, $object ) = @_;
+    my $class = ref $object;
+
+    # temporarily acquire sha1 and raw methods
+    require Role::Tiny;
+    $self->store->put_object(
+        Role::Tiny->apply_roles_to_object(
+            $object, 'Git::Database::Role::WithRaw'
+        )
+    );
+
+    # go back to our former self
+    bless $object, $class;
+
+    return $object->digest;
+}
+
 1;
 
 __END__
@@ -92,7 +111,8 @@ L<Git::PurePerl> Git wrapper.
 This backend does the following roles
 (check their documentation for a list of supported methods):
 L<Git::Database::Role::Backend>,
-L<Git::Database::Role::ObjectReader>.
+L<Git::Database::Role::ObjectReader>,
+L<Git::Database::Role::ObjectWriter>.
 
 =head1 AUTHOR
 
