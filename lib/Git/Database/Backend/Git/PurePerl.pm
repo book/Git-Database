@@ -69,7 +69,7 @@ sub put_object {
 
     # temporarily acquire sha1 and raw methods
     require Role::Tiny;
-    $self->store->put_object(
+    $self->store->loose->put_object(
         Role::Tiny->apply_roles_to_object(
             $object, 'Git::Database::Role::WithRaw'
         )
