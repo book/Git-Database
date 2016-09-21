@@ -2,6 +2,8 @@ package Git::Database::Backend::Git::PurePerl;
 
 use Sub::Quote;
 
+use Git::Database::Object::Raw;
+
 use Moo;
 use namespace::clean;
 
@@ -65,19 +67,7 @@ sub all_digests {
 
 sub put_object {
     my ( $self, $object ) = @_;
-    my $class = ref $object;
-
-    # temporarily acquire sha1 and raw methods
-    require Role::Tiny;
-    $self->store->loose->put_object(
-        Role::Tiny->apply_roles_to_object(
-            $object, 'Git::Database::Role::WithRaw'
-        )
-    );
-
-    # go back to our former self
-    bless $object, $class;
-
+    $self->store->loose->put_object( Git::Database::Object::Raw->new($object) );
     return $object->digest;
 }
 
