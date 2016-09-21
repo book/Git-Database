@@ -148,7 +148,7 @@ my %cmp_for = (
 
         # can't use is_deeply here
         my $tag_info = $tag->tag_info;
-        for my $attr (qw( object type tag tagged_time comment )) {
+        for my $attr (qw( object type tag tagger_time comment )) {
             is( $tag_info->{$attr}, $test->{tag_info}{$attr},
                 "= tag_info.$attr" );
         }

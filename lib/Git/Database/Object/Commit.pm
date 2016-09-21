@@ -27,9 +27,9 @@ for my $attr (
     qw(
     tree_digest
     author
-    authored_time
+    author_date
     committer
-    committed_time
+    committer_date
     comment
     encoding
     )
@@ -44,8 +44,8 @@ sub parents_digest { @{ $_[0]->commit_info->{parents_digest} ||= [] }; }
 my %method_map = (
     'tree'      => 'tree_digest',
     'parent'    => '@parents_digest',
-    'author'    => 'authored_time',
-    'committer' => 'committed_time'
+    'author'    => 'author_date',
+    'committer' => 'committer_date'
 );
 
 # assumes commit_info is set
@@ -60,14 +60,14 @@ sub _build_content {
     $content .= join(
         ' ',
         author => $self->author->ident,
-        $self->authored_time->epoch,
-        DateTime::TimeZone->offset_as_string( $self->authored_time->offset )
+        $self->author_date->epoch,
+        DateTime::TimeZone->offset_as_string( $self->author_date->offset )
     ) . "\n";
     $content .= join(
         ' ',
         committer => $self->committer->ident,
-        $self->committed_time->epoch,
-        DateTime::TimeZone->offset_as_string( $self->committed_time->offset )
+        $self->committer_date->epoch,
+        DateTime::TimeZone->offset_as_string( $self->committer_date->offset )
     ) . "\n";
     $content .= "\n";
     my $comment = $self->comment;
@@ -190,17 +190,17 @@ commit's parents.
 A L<Git::Database::Actor> object representing the author of
 the commit.
 
-=head2 authored_time
+=head2 author_date
 
 A L<DateTime> object representing the date at which the author
-created the patch.
+created the commit.
 
 =head2 committer
 
 A L<Git::Database::Actor> object representing the committer of
 the commit.
 
-=head2 committed_time
+=head2 committer_date
 
 A L<DateTime> object representing the date at which the committer
 created the commit.
@@ -223,8 +223,8 @@ One (and only one) of the C<content> or C<commit_info> arguments is
 required.
 
 C<commit_info> is a reference to a hash containing the keys listed
-above, i.e. C<tree_digest>, C<author>, C<authored_time>, C<committer>,
-C<committed_time>, C<comment>, and C<encoding> (optional).
+above, i.e. C<tree_digest>, C<author>, C<author_date>, C<committer>,
+C<committed_date>, C<comment>, and C<encoding> (optional).
 
 =head1 SEE ALSO
 

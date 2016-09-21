@@ -75,7 +75,7 @@ use Git::Database::DirectoryEntry;
                     name  => 'Philippe Bruhat (BooK)',
                     email => 'book@cpan.org'
                 ),
-                authored_time => DateTime->from_epoch(
+                author_date => DateTime->from_epoch(
                     epoch     => 1352762713,
                     time_zone => '+0100'
                 ),
@@ -83,7 +83,7 @@ use Git::Database::DirectoryEntry;
                     name  => 'Philippe Bruhat (BooK)',
                     email => 'book@cpan.org'
                 ),
-                committed_time => DateTime->from_epoch(
+                committer_date => DateTime->from_epoch(
                     epoch     => 1352764647,
                     time_zone => '+0100'
                 ),
@@ -108,7 +108,7 @@ COMMIT
                     name  => 'Philippe Bruhat (BooK)',
                     email => 'book@cpan.org'
                 ),
-                authored_time => DateTime->from_epoch(
+                author_date => DateTime->from_epoch(
                     epoch     => 1352766313,
                     time_zone => '+0100'
                 ),
@@ -116,7 +116,7 @@ COMMIT
                     name  => 'Philippe Bruhat (BooK)',
                     email => 'book@cpan.org'
                 ),
-                committed_time => DateTime->from_epoch(
+                committer_date => DateTime->from_epoch(
                     epoch     => 1352766360,
                     time_zone => '+0100'
                 ),
@@ -144,7 +144,7 @@ COMMIT
                     name  => 'Philippe Bruhat (BooK)',
                     email => 'book@cpan.org'
                 ),
-                authored_time => DateTime->from_epoch(
+                author_date => DateTime->from_epoch(
                     epoch     => 1358247404,
                     time_zone => '+0100'
                 ),
@@ -152,7 +152,7 @@ COMMIT
                     name  => 'Philippe Bruhat (BooK)',
                     email => 'book@cpan.org'
                 ),
-                committed_time => DateTime->from_epoch(
+                committer_date => DateTime->from_epoch(
                     epoch     => 1358247404,
                     time_zone => '+0100'
                 ),
@@ -181,7 +181,7 @@ COMMIT
                     name  => 'Philippe Bruhat (BooK)',
                     email => 'book@cpan.org'
                 ),
-                tagged_time => DateTime->from_epoch(
+                tagger_date => DateTime->from_epoch(
                     epoch     => 1352846959,
                     time_zone => '+0100'
                 ),

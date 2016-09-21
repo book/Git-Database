@@ -29,7 +29,7 @@ for my $attr (
     type
     tag
     tagger
-    tagged_time
+    tagger_date
     comment
     )
     )
@@ -52,7 +52,7 @@ sub _build_tag_info {
                 name => join( ' ', @data ),
                 email => substr( $email, 1, -1 )
             );
-            $tag_info->{tagged_time} = DateTime->from_epoch(
+            $tag_info->{tagger_date} = DateTime->from_epoch(
                 epoch     => $epoch,
                 time_zone => $tz
             );
@@ -76,8 +76,8 @@ sub _build_content {
     $content .= join(
         ' ',
         tagger => $self->tagger->ident,
-        $self->tagged_time->epoch,
-        DateTime::TimeZone->offset_as_string( $self->tagged_time->offset )
+        $self->tagger_date->epoch,
+        DateTime::TimeZone->offset_as_string( $self->tagger_date->offset )
     ) . "\n";
     $content .= "\n";
     my $comment = $self->comment;
@@ -161,7 +161,7 @@ The tag name.
 A L<Git::Database::Actor> object representing the author of
 the tag.
 
-=head2 tagged_time
+=head2 tagger_date
 
 A L<DateTime> object representing the date at which the author
 created the tag.
@@ -180,7 +180,7 @@ One (and only one) of the C<content> or C<tag> arguments is
 required.
 
 C<tag_info> is a reference to a hash containing the keys listed
-above, i.e.  C<object>, C<type>, C<tag>, C<tagger>, C<tagged_time>,
+above, i.e.  C<object>, C<type>, C<tag>, C<tagger>, C<tagger_time>,
 and C<comment>.
 
 =head1 SEE ALSO
