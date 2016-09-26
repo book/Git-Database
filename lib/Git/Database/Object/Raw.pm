@@ -25,6 +25,10 @@ __END__
 
 =pod
 
+=for Pod::Coverage
+  BUILDARGS
+  kind
+
 =head1 NAME
 
 Git::Database::Object::Raw - Raw Git::Database objects
