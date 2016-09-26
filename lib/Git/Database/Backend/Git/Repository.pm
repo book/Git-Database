@@ -19,6 +19,7 @@ has '+store' => (
           if !eval { $_[0]->isa('Git::Repository') }
         # die version check
     } ),
+    default => sub { Git::Repository->new },
 );
 
 has object_factory => (
