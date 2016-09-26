@@ -2,7 +2,6 @@ package Git::Database;
 
 use Module::Runtime qw( use_module );
 
-use Moo;
 use namespace::clean;
 
 sub new {
