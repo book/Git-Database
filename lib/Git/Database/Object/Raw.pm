@@ -5,7 +5,6 @@ use Moo;
 has kind => (
     is        => 'ro',
     required  => 1,
-    predicate => 1,
 );
 
 with 'Git::Database::Role::Object';
