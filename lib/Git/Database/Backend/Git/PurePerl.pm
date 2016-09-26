@@ -20,15 +20,6 @@ has '+store' => (
     } ),
 );
 
-sub get_object_meta {
-    my ( $self, $digest ) = @_;
-
-    my $attr = $self->get_object_attributes($digest);
-    return $attr
-      ? ( @{$attr}{qw( digest kind size )} )
-      : ( $digest, 'missing', undef );
-}
-
 sub get_object_attributes {
     my ( $self, $digest ) = @_;
 
