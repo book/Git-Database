@@ -21,21 +21,20 @@ test_backends(
     sub {
         my ( $backend, $is_empty, $source ) = @_;
         my $class = ref $backend;
-        my $db = Git::Database->new( backend => $backend );
 
         # stuff we're sure of
         ok(
-            $db->does('Git::Database::Role::Backend'),
+            $backend->does('Git::Database::Role::Backend'),
             "does Git::Database::Role::Backend"
         );
-        ok( !$db->can('zlonk'), "cant'( zlonk )" );
+        ok( !$backend->can('zlonk'), "cant'( zlonk )" );
 
         for my $role ( sort keys %methods_for ) {
-            if ( $db->does($role) ) {
-                ok( $db->can($_), "can( $_ )" ) for @{ $methods_for{$role} };
+            if ( $backend->does($role) ) {
+                ok( $backend->can($_), "can( $_ )" ) for @{ $methods_for{$role} };
             }
             else {
-                ok( !$db->can($_), "can't( $_ )" ) for @{ $methods_for{$role} };
+                ok( !$backend->can($_), "can't( $_ )" ) for @{ $methods_for{$role} };
             }
         }
     },

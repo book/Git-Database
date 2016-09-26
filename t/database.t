@@ -17,7 +17,7 @@ my $dir = empty_repository;
 for my $backend ( available_backends() ) {
 
     # provide backend directly
-    $db = Git::Database->new( backend => backend_for( $backend, $dir ) );
+    $db = backend_for( $backend, $dir );
     isa_ok( $db, "Git::Database::Backend::$backend" );
     isa_ok( $db->store, $backend ) if $backend ne 'None';
 
@@ -28,26 +28,6 @@ for my $backend ( available_backends() ) {
 }
 
 # some error cases
-ok(
-    !eval { $db = Git::Database->new( backend => 'fail' ) },
-    'backend does not Git::Database::Role::Backend'
-);
-like(
-    $@,
-    qr/^fail DOES not Git::Database::Role::Backend /,
-    '... expected error message'
-);
-
-ok(
-    !eval { $db = Git::Database->new( backend => 'backend', store => 'store' ) },
-    'backend and store are mutually exclusive'
-);
-like(
-    $@,
-    qr/^'store' is incompatible with 'backend' /,
-    '... expected error message'
-);
-
 ok(
     !eval { $db = Git::Database->new( store => bless( {}, 'Nope' ) ) },
     'Git::Database::Backend::Nope does not exist'
