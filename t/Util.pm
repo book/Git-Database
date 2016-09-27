@@ -89,18 +89,18 @@ for my $file ( glob File::Spec->catfile(qw( t bundles * )) ) {
 }
 
 sub available_objects {
-    return grep exists $test_data{$_}{'.perl'}, keys %test_data;
+    return grep exists $test_data{$_}{'.perl'}, sort keys %test_data;
 }
 
 sub available_bundles {
-    return grep exists $test_data{$_}{'.bundle'}, keys %test_data;
+    return grep exists $test_data{$_}{'.bundle'}, sort keys %test_data;
 }
 
 sub available_backends {
     return 'None',    # always available
       map eval { Module::Runtime::use_module($_) },
       grep !/^None$/,
-      keys %builder_for;
+      sort keys %builder_for;
 }
 
 sub bundle_for { return $test_data{ $_[0] }{'.bundle'} }
