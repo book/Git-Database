@@ -1,0 +1,120 @@
+package Git::Database::Backend::Cogit;
+
+use Sub::Quote;
+
+use Git::Database::Object::Raw;
+
+use Moo;
+use namespace::clean;
+
+with
+  'Git::Database::Role::Backend',
+  'Git::Database::Role::ObjectReader',
+  'Git::Database::Role::ObjectWriter',
+  ;
+
+has '+store' => (
+    isa => quote_sub( q{
+        die 'store is not a Cogit object'
+          if !eval { $_[0]->isa('Cogit') }
+    } ),
+);
+
+sub get_object_attributes {
+    my ( $self, $digest ) = @_;
+
+    # search packs
+    for my $pack ( @{ $self->store->packs } ) {
+        my ( $kind, $size, $content ) = $pack->get_object($digest);
+        if ( defined($kind) && defined($size) && defined($content) ) {
+            return {
+                kind    => $kind,
+                digest  => $digest,
+                content => $content,
+                size    => $size,
+            };
+        }
+    }
+
+    # search loose objects
+    my ( $kind, $size, $content ) = $self->store->loose->get_object($digest);
+    if ( defined($kind) && defined($size) && defined($content) ) {
+        return {
+            kind    => $kind,
+            digest  => $digest,
+            content => $content,
+            size    => $size,
+        };
+    }
+
+    return undef;
+}
+
+sub all_digests {
+    my ( $self, $kind ) = @_;
+    return $self->store->all_sha1s->all if !$kind;
+    return map $_->sha1, grep $_->kind eq $kind, $self->store->all_objects->all;
+}
+
+sub put_object {
+    my ( $self, $object ) = @_;
+    $self->store->loose->put_object( Git::Database::Object::Raw->new($object) );
+    return $object->digest;
+}
+
+1;
+
+__END__
+
+=pod
+
+=for Pod::Coverage
+  hash_object
+  get_object_attributes
+  get_object_meta
+  all_digests
+  put_object
+
+=head1 NAME
+
+Git::Database::Backend::Cogit - A Git::Database backend based on Cogit
+
+=head1 SYNOPSIS
+
+    # get a store
+    my $r  = Cogit->new();
+
+    # provide the backend
+    my $b  = Git::Database::Backend::Cogit->new( store => $r );
+    my $db = Git::Database->new( backend => $b );
+
+    # let Git::Database figure it out by itself
+    my $db = Git::Database->new( store => $r );
+
+=head1 DESCRIPTION
+
+This backend reads data from a Git repository using the L<Cogit>
+Git wrapper.
+
+=head2 Git Database Roles
+
+This backend does the following roles
+(check their documentation for a list of supported methods):
+L<Git::Database::Role::Backend>,
+L<Git::Database::Role::ObjectReader>,
+L<Git::Database::Role::ObjectWriter>.
+
+=head1 AUTHOR
+
+Philippe Bruhat (BooK) <book@cpan.org>
+
+=head1 COPYRIGHT
+
+Copyright 2016 Philippe Bruhat (BooK), all rights reserved.
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut
