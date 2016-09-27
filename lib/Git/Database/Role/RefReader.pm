@@ -24,7 +24,7 @@ __END__
 
 =head1 NAME
 
-Git::Database::Role::RefReader - Abstract role for a Git database backend
+Git::Database::Role::RefReader - Abstract role for Git backends that read references
 
 =head1 SYNOPSIS
 

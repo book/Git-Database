@@ -15,7 +15,7 @@ __END__
 
 =head1 NAME
 
-Git::Database::Role::RefWriter - Abstract role for a Git database backend
+Git::Database::Role::RefWriter - Abstract role for Git backends that write references
 
 =head1 SYNOPSIS
 

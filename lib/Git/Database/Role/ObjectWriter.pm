@@ -14,7 +14,7 @@ __END__
 
 =head1 NAME
 
-Git::Database::Role::ObjectWriter - Abstract role for a Git database backend
+Git::Database::Role::ObjectWriter - Abstract role for Git backends that write objects
 
 =head1 SYNOPSIS
 
