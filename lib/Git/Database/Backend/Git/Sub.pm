@@ -13,8 +13,7 @@ with
   'Git::Database::Role::ObjectReader',
   ;
 
-# the store attribute is a string
-# so the auto-detection of the backend in Git::Database can't work
+# the store attribute is a directory name
 
 sub hash_object {
     my ( $self, $object ) = @_;
@@ -90,3 +89,55 @@ sub all_digests {
 }
 
 1;
+
+__END__
+
+=pod
+
+=for Pod::Coverage
+  has_object_checker
+  has_object_factory
+  DEMOLISH
+  hash_object
+  get_object_attributes
+  get_object_meta
+  all_digests
+
+=head1 NAME
+
+Git::Database::Backend::Git::Sub - A Git::Database backend based on Git::Sub
+
+=head1 SYNOPSIS
+
+    # Git::Sub does not offer an OO interface
+    $dir = 'path/to/some/git/repository/';
+
+    # let Git::Database figure it out by itself
+    my $db = Git::Database->new( store => $dir );
+
+=head1 DESCRIPTION
+
+This backend reads and write data from a Git repository using the
+L<Git::Sub> Git wrapper.
+
+=head2 Git Database Roles
+
+This backend does the following roles
+(check their documentation for a list of supported methods):
+L<Git::Database::Role::Backend>,
+L<Git::Database::Role::ObjectReader>.
+
+=head1 AUTHOR
+
+Philippe Bruhat (BooK) <book@cpan.org>
+
+=head1 COPYRIGHT
+
+Copyright 2016 Philippe Bruhat (BooK), all rights reserved.
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut
