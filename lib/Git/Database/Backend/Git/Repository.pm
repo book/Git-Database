@@ -1,5 +1,6 @@
 package Git::Database::Backend::Git::Repository;
 
+use IO::Select;
 use Sub::Quote;
 
 use Moo;
@@ -57,6 +58,12 @@ sub get_object_meta {
     local $/ = "\012";
     chomp( my $reply = $checker->stdout->getline );
 
+    # git error messages
+    my $bang;
+    my $select = IO::Select->new( my $err = $checker->stderr );
+    $bang .= $checker->getline while $select->can_read(0);
+    warn $bang if $bang;
+
     # protect against weird cases like if $digest contains a space
     my @parts = split / /, $reply;
     return ( $digest, 'missing', undef ) if $parts[-1] eq 'missing';
@@ -79,6 +86,12 @@ sub get_object_attributes {
 
     # protect against weird cases like if $sha1 contains a space
     my ( $sha1, $kind, $size ) = my @parts = split / /, $reply;
+
+    # git error messages
+    my $bang;
+    my $select = IO::Select->new( my $err = $factory->stderr );
+    $bang .= $err->getline while $select->can_read(0);
+    warn $bang if $bang;
 
     # object does not exist in the git object database
     return if $parts[-1] eq 'missing';
