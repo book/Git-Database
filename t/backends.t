@@ -1,7 +1,6 @@
 use strict;
 use warnings;
 use Test::More;
-use List::Util qw( uniq );
 use Git::Database;
 
 use t::Util;
@@ -185,8 +184,12 @@ test_backends(
         }
 
         my $objects = objects_from($source);
-        my %digests =
-          map +( $_ => [ uniq sort map $_->{digest}, @{ $objects->{$_} } ] ),
+        my %digests = map +(
+            $_ => do {
+                my %s;
+                [ grep !$s{$_}++, sort map $_->{digest}, @{ $objects->{$_} } ];
+              }
+          ),
           @kinds;
 
         is_deeply( [ $backend->all_digests($_) ],
