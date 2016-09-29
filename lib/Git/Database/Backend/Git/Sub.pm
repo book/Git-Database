@@ -12,6 +12,7 @@ with
   'Git::Database::Role::Backend',
   'Git::Database::Role::ObjectReader',
   'Git::Database::Role::ObjectWriter',
+  'Git::Database::Role::RefReader',
   ;
 
 # the store attribute is a directory name
@@ -107,6 +108,19 @@ sub put_object {
     return $hash;
 }
 
+# Git::Database::Role::RefReader
+sub refs {
+    my ($self) = @_;
+    my $home   = cwd();
+    my $dir    = $self->store;
+    chdir $dir or die "Can't chdir to $dir: $!";
+    local $_;    # Git::Sub seems to clobber $_ in list context
+    my %digest = reverse map +( split / / ),
+      git::show_ref '--head';
+    chdir $home or die "Can't chdir to $home: $!";
+    return \%digest;
+}
+
 1;
 
 __END__
@@ -122,6 +136,7 @@ __END__
   get_object_meta
   all_digests
   put_object
+  refs
 
 =head1 NAME
 
@@ -146,7 +161,8 @@ This backend does the following roles
 (check their documentation for a list of supported methods):
 L<Git::Database::Role::Backend>,
 L<Git::Database::Role::ObjectReader>,
-L<Git::Database::Role::ObjectWriter>.
+L<Git::Database::Role::ObjectWriter>,
+L<Git::Database::Role::RefReader>.
 
 =head1 AUTHOR
 
