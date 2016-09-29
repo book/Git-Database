@@ -9,7 +9,7 @@ sub new {
 
     # store: an object that gives actual access to a git repo
     if ( my $store = delete $args->{store} ) {
-        if ( !ref $store ) {
+        if ( !ref $store || -d $store ) {
             require Git::Database::Backend::Git::Sub;
             return Git::Database::Backend::Git::Sub->new( store => $store );
         }
