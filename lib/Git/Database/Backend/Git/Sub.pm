@@ -11,12 +11,14 @@ use namespace::clean;
 with
   'Git::Database::Role::Backend',
   'Git::Database::Role::ObjectReader',
+  'Git::Database::Role::ObjectWriter',
   ;
 
 # the store attribute is a directory name
 # or an object representing a directory
 # (e.g. Path::Class, Path::Tiny, File::Fu)
 
+# Git::Database::Role::Backend
 sub hash_object {
     my ( $self, $object ) = @_;
     my $home = cwd();
@@ -29,6 +31,7 @@ sub hash_object {
     return $hash;
 }
 
+# Git::Database::Role::ObjectReader
 sub get_object_meta {
     my ( $self, $digest ) = @_;
     my $home = cwd();
@@ -90,6 +93,20 @@ sub all_digests {
     return @digests;
 }
 
+# Git::Database::Role::ObjectWriter
+sub put_object {
+    my ( $self, $object ) = @_;
+    my $home = cwd();
+    my $dir  = $self->store;
+    chdir $dir or die "Can't chdir to $dir: $!";
+    my $hash = git::hash_object
+      '-w',
+      '-t'      => $object->kind,
+      '--stdin' => \$object->content;
+    chdir $home or die "Can't chdir to $home: $!";
+    return $hash;
+}
+
 1;
 
 __END__
@@ -104,6 +121,7 @@ __END__
   get_object_attributes
   get_object_meta
   all_digests
+  put_object
 
 =head1 NAME
 
@@ -127,7 +145,8 @@ L<Git::Sub> Git wrapper.
 This backend does the following roles
 (check their documentation for a list of supported methods):
 L<Git::Database::Role::Backend>,
-L<Git::Database::Role::ObjectReader>.
+L<Git::Database::Role::ObjectReader>,
+L<Git::Database::Role::ObjectWriter>.
 
 =head1 AUTHOR
 
