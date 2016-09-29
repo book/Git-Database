@@ -14,6 +14,8 @@ with
   ;
 
 # the store attribute is a directory name
+# or an object representing a directory
+# (e.g. Path::Class, Path::Tiny, File::Fu)
 
 sub hash_object {
     my ( $self, $object ) = @_;
