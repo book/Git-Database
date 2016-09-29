@@ -84,11 +84,7 @@ Git::Database::Backend::Cogit - A Git::Database backend based on Cogit
     # get a store
     my $r  = Cogit->new();
 
-    # provide the backend
-    my $b  = Git::Database::Backend::Cogit->new( store => $r );
-    my $db = Git::Database->new( backend => $b );
-
-    # let Git::Database figure it out by itself
+    # let Git::Database produce the backend
     my $db = Git::Database->new( store => $r );
 
 =head1 DESCRIPTION
