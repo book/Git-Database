@@ -84,11 +84,7 @@ Git::Database::Backend::Git::PurePerl - A Git::Database backend based on Git::Pu
     # get a store
     my $r  = Git::PurePerl->new();
 
-    # provide the backend
-    my $b  = Git::Database::Backend::Git::PurePerl->new( store => $r );
-    my $db = Git::Database->new( backend => $b );
-
-    # let Git::Database figure it out by itself
+    # let Git::Database produce the backend
     my $db = Git::Database->new( store => $r );
 
 =head1 DESCRIPTION
