@@ -2,7 +2,7 @@ package Git::Database;
 
 use Module::Runtime qw( use_module );
 
-use Moo;
+use Moo::Object ();
 use namespace::clean;
 
 sub new {
@@ -11,22 +11,11 @@ sub new {
     # store: an object that gives actual access to a git repo
     if ( my $store = delete $args->{store} ) {
 
-        # should be the sole attribute
-        my @nope = grep exists $args->{$_}, qw( backend );
-        local $" = "', '";
-        die "'store' is incompatible with '@nope'" if @nope;
-
         return use_module( "Git::Database::Backend::" . ref $store )
           ->new( store => $store );
     }
 
-    # pass the backend attribute through
-    if ( my $backend = delete $args->{backend} ) {
-        die "$backend DOES not Git::Database::Role::Backend"
-          if !eval { $backend->does('Git::Database::Role::Backend') };
-        return $backend;
-    }
-
+    # some really basic default
     return use_module('Git::Database::Backend::None')->new;
 }
 

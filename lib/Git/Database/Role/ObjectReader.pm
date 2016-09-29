@@ -49,7 +49,7 @@ __END__
 
 =head1 NAME
 
-Git::Database::Role::ObjectReader - Abstract role for a Git database backend
+Git::Database::Role::ObjectReader - Abstract role for a Git backends that read objects
 
 =head1 SYNOPSIS
 

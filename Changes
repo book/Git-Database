@@ -1,6 +1,8 @@
 Revision history for Git-Database
 
 {{$NEXT}}
+
+0.001 2016-09-27 BOOK
     - Git::Database provides an OO interface to the Git object database
       (similar to Git::PurePerl, but with a choice of backends for interacting
       with the Git repositories)

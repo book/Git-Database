@@ -1,7 +1,6 @@
 use strict;
 use warnings;
 use Test::More;
-use List::Util qw( uniq );
 use Git::Database;
 
 use t::Util;
@@ -43,9 +42,6 @@ test_kind(
         my ( $backend, $is_empty, @objects ) = @_;
         my $is_reader = $backend->does('Git::Database::Role::ObjectReader');
         my $is_writer = $backend->does('Git::Database::Role::ObjectWriter');
-
-        # a database for this backend
-        my $db = Git::Database->new( backend => $backend );
 
         # figure out the store class
         my $class = substr( ref $backend, 24 );  # drop Git::Database::Backend::
@@ -143,17 +139,17 @@ test_kind(
                 "$test->{desc} [found in its own repository]",
                 sub {
                     # has_object
-                    ok( $db->has_object($digest), "has_object( $digest )" );
+                    ok( $backend->has_object($digest), "has_object( $digest )" );
 
                     # get_object_meta
                     is_deeply(
-                        [ $db->get_object_meta($digest) ],
+                        [ $backend->get_object_meta($digest) ],
                         [ $digest, $kind, $test->{size} ],
                         "get_object_meta( $digest )"
                     );
 
                     # fetching the object
-                    cmp_git_objects( $db->get_object($digest), $test );
+                    cmp_git_objects( $backend->get_object($digest), $test );
 
                     # create the object with only the digest
                     cmp_git_objects(
@@ -188,8 +184,12 @@ test_backends(
         }
 
         my $objects = objects_from($source);
-        my %digests =
-          map +( $_ => [ uniq sort map $_->{digest}, @{ $objects->{$_} } ] ),
+        my %digests = map +(
+            $_ => do {
+                my %s;
+                [ grep !$s{$_}++, sort map $_->{digest}, @{ $objects->{$_} } ];
+              }
+          ),
           @kinds;
 
         is_deeply( [ $backend->all_digests($_) ],

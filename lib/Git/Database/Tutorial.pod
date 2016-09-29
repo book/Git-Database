@@ -20,6 +20,8 @@ The local Git repository, as managed by B<git>.
 =item backend
 
 A class doing the L<Git::Database::Role::Backend> role.
+The L<Git::Database> module acts as a frontend that returns a backend
+object.
 
 It manages all interactions with the Git repository, via its L<store>.
 A backend instance is always connected to a store instance.

@@ -27,9 +27,9 @@ for my $attr (
     qw(
     tree_digest
     author
-    authored_time
+    author_date
     committer
-    committed_time
+    committer_date
     comment
     encoding
     )
@@ -40,13 +40,6 @@ for my $attr (
 }
 
 sub parents_digest { @{ $_[0]->commit_info->{parents_digest} ||= [] }; }
-
-my %method_map = (
-    'tree'      => 'tree_digest',
-    'parent'    => '@parents_digest',
-    'author'    => 'authored_time',
-    'committer' => 'committed_time'
-);
 
 # assumes commit_info is set
 sub _build_content {
@@ -60,14 +53,14 @@ sub _build_content {
     $content .= join(
         ' ',
         author => $self->author->ident,
-        $self->authored_time->epoch,
-        DateTime::TimeZone->offset_as_string( $self->authored_time->offset )
+        $self->author_date->epoch,
+        DateTime::TimeZone->offset_as_string( $self->author_date->offset )
     ) . "\n";
     $content .= join(
         ' ',
         committer => $self->committer->ident,
-        $self->committed_time->epoch,
-        DateTime::TimeZone->offset_as_string( $self->committed_time->offset )
+        $self->committer_date->epoch,
+        DateTime::TimeZone->offset_as_string( $self->committer_date->offset )
     ) . "\n";
     $content .= "\n";
     my $comment = $self->comment;
@@ -80,43 +73,63 @@ sub _build_content {
 # assumes content is set
 sub _build_commit_info {
     my $self = shift;
-    my $commit_info = { parents_digest => [] };
-
     my @lines = split "\n", $self->content;
+
+    # parse the headers
     my %header;
+    my $mergetag_num = 0;
     while ( my $line = shift @lines ) {
-        my ( $key, $value ) = split ' ', $line, 2;
+        my ( $key, $value ) = split / /, $line, 2;
+
+        # multiline value that may appear multiple times
+        $key = $mergetag_num++ . $key if $key eq 'mergetag';
+
+        # each key points to an array ref
         push @{ $header{$key} }, $value;
+
+        # handle continuation lines
+        $header{''} = $header{$key} if $key;
     }
-    $header{encoding} = ['utf-8'];
-    my $encoding = $header{encoding}->[-1];
-    for my $key ( keys %header ) {
-        for my $value ( @{ $header{$key} } ) {
-            $value = decode( $encoding, $value );
-            if ( $key eq 'committer' or $key eq 'author' ) {
-                my @data = split ' ', $value;
-                my ( $email, $epoch, $tz ) = splice( @data, -3 );
-                $commit_info->{$key} = Git::Database::Actor->new(
-                    name => join( ' ', @data ),
-                    email => substr( $email, 1, -1 ),
-                );
-                $key = $method_map{$key};
-                $commit_info->{$key} = DateTime->from_epoch(
-                    epoch     => $epoch,
-                    time_zone => $tz
-                );
-            }
-            else {
-                my $mkey = $method_map{$key} || $key;
-                if ( $mkey =~ s/^\@// ) {
-                    push @{ $commit_info->{$mkey} }, $value;
-                }
-                else { $commit_info->{$mkey} = $value; }
-            }
-        }
+    delete $header{''};
+
+    # construct commit_info from the header values
+    my %commit_info = (
+
+        # those appear once and only once
+        tree_digest => ( delete $header{tree} )->[0],
+        author      => ( delete $header{author} )->[0],
+        committer   => ( delete $header{committer} )->[0],
+
+        # may appear zero or one time (with a default value)
+        encoding => ( delete $header{encoding} || ['utf-8'] )->[0],
+
+        # optional list
+        parents_digest => delete $header{parent} || [],
+    );
+
+    # we should have processed all possible keys at this stage
+    die "Unknown commit keys: @{[ keys %header ]}"
+      if keys %header;
+
+    # the message is made of the remaining lines
+    $commit_info{comment} =
+      decode( $commit_info{encoding}, join "\n", @lines );
+
+    # instantiate actors and datetimes
+    for my $key (qw( author committer )) {
+        my @data = split ' ', $commit_info{$key};
+        my ( $email, $epoch, $tz ) = splice( @data, -3 );
+        $commit_info{$key} = Git::Database::Actor->new(
+            name => join( ' ', @data ),
+            email => substr( $email, 1, -1 ),
+        );
+        $commit_info{"${key}_date"} = DateTime->from_epoch(
+            epoch     => $epoch,
+            time_zone => $tz
+        );
     }
-    $commit_info->{comment} = decode( $encoding, join "\n", @lines );
-    return $commit_info;
+
+    return \%commit_info;
 }
 
 1;
@@ -190,17 +203,17 @@ commit's parents.
 A L<Git::Database::Actor> object representing the author of
 the commit.
 
-=head2 authored_time
+=head2 author_date
 
 A L<DateTime> object representing the date at which the author
-created the patch.
+created the commit.
 
 =head2 committer
 
 A L<Git::Database::Actor> object representing the committer of
 the commit.
 
-=head2 committed_time
+=head2 committer_date
 
 A L<DateTime> object representing the date at which the committer
 created the commit.
@@ -223,8 +236,8 @@ One (and only one) of the C<content> or C<commit_info> arguments is
 required.
 
 C<commit_info> is a reference to a hash containing the keys listed
-above, i.e. C<tree_digest>, C<author>, C<authored_time>, C<committer>,
-C<committed_time>, C<comment>, and C<encoding> (optional).
+above, i.e. C<tree_digest>, C<author>, C<author_date>, C<committer>,
+C<committed_date>, C<comment>, and C<encoding> (optional).
 
 =head1 SEE ALSO
 
