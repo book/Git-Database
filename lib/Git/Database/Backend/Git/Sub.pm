@@ -13,6 +13,7 @@ with
   'Git::Database::Role::ObjectReader',
   'Git::Database::Role::ObjectWriter',
   'Git::Database::Role::RefReader',
+  'Git::Database::Role::RefWriter',
   ;
 
 # the store attribute is a directory name
@@ -121,6 +122,25 @@ sub refs {
     return \%digest;
 }
 
+# Git::Database::Role::RefWriter
+sub put_ref {
+    my ( $self, $refname, $digest ) = @_;
+    my $home = cwd();
+    my $dir  = $self->store;
+    chdir $dir or die "Can't chdir to $dir: $!";
+    git::update_ref( $refname, $digest );
+    chdir $home or die "Can't chdir to $home: $!";
+}
+
+sub delete_ref {
+    my ( $self, $refname ) = @_;
+    my $home = cwd();
+    my $dir  = $self->store;
+    chdir $dir or die "Can't chdir to $dir: $!";
+    git::update_ref( '-d', $refname );
+    chdir $home or die "Can't chdir to $home: $!";
+}
+
 1;
 
 __END__
@@ -137,6 +157,8 @@ __END__
   all_digests
   put_object
   refs
+  put_ref
+  delete_ref
 
 =head1 NAME
 
@@ -162,7 +184,8 @@ This backend does the following roles
 L<Git::Database::Role::Backend>,
 L<Git::Database::Role::ObjectReader>,
 L<Git::Database::Role::ObjectWriter>,
-L<Git::Database::Role::RefReader>.
+L<Git::Database::Role::RefReader>,
+L<Git::Database::Role::RefWriter>.
 
 =head1 AUTHOR
 
