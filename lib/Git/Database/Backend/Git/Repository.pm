@@ -124,11 +124,27 @@ sub get_object_attributes {
 
 sub all_digests {
     my ( $self, $kind ) = @_;
+    my $store = $self->store;
     my $re = $kind ? qr/ \Q$kind\E / : qr/ /;
 
-    return map +( split / / )[0],
-      grep /$re/,
-      $self->store->run(qw( cat-file --batch-check --batch-all-objects ));
+    # the --batch-all-objects option appeared in v2.6.0-rc0
+    if ( $store->version_ge('2.6.0.rc0') ) {
+        return map +( split / / )[0],
+          grep /$re/,
+          $store->run(qw( cat-file --batch-check --batch-all-objects ));
+    }
+    else {    # this won't return unreachable objects
+        my $batch = $store->command(qw( cat-file --batch-check ));
+        my @ids   = $store->run(qw( rev-list --all --objects ));
+        return () if !@ids;
+
+        my ( $stdin, $stdout ) = ( $batch->stdin, $batch->stdout );
+        return map +( split / / )[0],
+          grep /$re/,
+          map { print { $batch->stdin } "$_\n"; $batch->stdout->getline }
+          map +( split / / )[0],
+          sort @ids;
+    }
 }
 
 # Git::Database::Role::ObjectWriter
