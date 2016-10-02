@@ -61,7 +61,7 @@ sub get_object_meta {
     # git error messages
     my $bang;
     my $select = IO::Select->new( my $err = $checker->stderr );
-    $bang .= $checker->getline while $select->can_read(0);
+    $bang .= $err->getline while $select->can_read(0);
     warn $bang if $bang;
 
     # protect against weird cases like if $digest contains a space
