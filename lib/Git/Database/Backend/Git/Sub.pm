@@ -1,9 +1,7 @@
 package Git::Database::Backend::Git::Sub;
 
 use Cwd qw( cwd );
-use Git::Sub qw(
-  hash_object
-);
+use Git::Sub;
 
 use Moo;
 use namespace::clean;
