@@ -2,6 +2,7 @@ package Git::Database::Backend::Git::Sub;
 
 use Cwd qw( cwd );
 use Git::Sub;
+use Git::Version::Compare qw( ge_git );
 
 use Moo;
 use namespace::clean;
@@ -85,9 +86,20 @@ sub all_digests {
 
     local $_;    # Git::Sub seems to clobber $_ in list context
     my $re = $kind ? qr/ \Q$kind\E / : qr/ /;
-    my @digests = map +( split / / )[0],
-      grep /$re/,
-      git::cat_file '--batch-check', '--batch-all-objects';
+    my @digests;
+
+    # the --batch-all-objects option appeared in v2.6.0-rc0
+    if ( ge_git git::version, '2.6.0.rc0' ) {
+        @digests = map +( split / / )[0],
+          grep /$re/,
+          git::cat_file '--batch-check', '--batch-all-objects';
+    }
+    else {    # this won't return unreachable objects
+        @digests =
+          map +( split / / )[0], grep /$re/,
+          git::cat_file '--batch-check', \join '', map +( split / / )[0] . "\n",
+          sort +git::rev_list '--all', '--objects';
+    }
 
     chdir $home or die "Can't chdir to $home: $!";
     return @digests;
