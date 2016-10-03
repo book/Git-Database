@@ -135,15 +135,13 @@ sub all_digests {
     }
     else {    # this won't return unreachable objects
         my $batch = $store->command(qw( cat-file --batch-check ));
-        my @ids   = $store->run(qw( rev-list --all --objects ));
-        return () if !@ids;
-
         my ( $stdin, $stdout ) = ( $batch->stdin, $batch->stdout );
-        return map +( split / / )[0],
-          grep /$re/,
-          map { print { $batch->stdin } "$_\n"; $batch->stdout->getline }
-          map +( split / / )[0],
-          sort @ids;
+        my @digests =
+          map +( split / / )[0], grep /$re/,
+          map { print {$stdin} ( split / / )[0], "\n"; $stdout->getline }
+          sort $store->run(qw( rev-list --all --objects ));
+        $batch->close;
+        return @digests;
     }
 }
 
