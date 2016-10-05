@@ -1,8 +1,8 @@
 package Git::Database::Backend::Git::Sub;
 
-use Cwd qw( cwd );
 use Git::Sub;
 use Git::Version::Compare qw( ge_git );
+use File::pushd qw( pushd );
 
 use Moo;
 use namespace::clean;
@@ -22,25 +22,19 @@ with
 # Git::Database::Role::Backend
 sub hash_object {
     my ( $self, $object ) = @_;
-    my $home = cwd();
-    my $dir  = $self->store;
-    chdir $dir or die "Can't chdir to $dir: $!";
+    my $keeper = pushd $self->store;
     my $hash = git::hash_object
       '-t'      => $object->kind,
       '--stdin' => \$object->content;
-    chdir $home or die "Can't chdir to $home: $!";
     return $hash;
 }
 
 # Git::Database::Role::ObjectReader
 sub get_object_meta {
     my ( $self, $digest ) = @_;
-    my $home = cwd();
-    my $dir  = $self->store;
-    chdir $dir or die "Can't chdir to $dir: $!";
+    my $keeper = pushd $self->store;
     my $meta = git::cat_file
       '--batch-check' => \"$digest\n";
-    chdir $home or die "Can't chdir to $home: $!";
 
     # protect against weird cases like if $digest contains a space
     my @parts = split / /, $meta;
@@ -52,15 +46,12 @@ sub get_object_meta {
 
 sub get_object_attributes {
     my ( $self, $digest ) = @_;
-    my $home = cwd();
-    my $dir  = $self->store;
-    chdir $dir or die "Can't chdir to $dir: $!";
 
     my $out = do {
+        my $keeper = pushd $self->store;
         local $/;
         git::cat_file '--batch' => \"$digest\n";
     };
-    chdir $home or die "Can't chdir to $home: $!";
 
     my ( $meta, $content ) = split "\n", $out, 2;
 
@@ -80,13 +71,12 @@ sub get_object_attributes {
 
 sub all_digests {
     my ( $self, $kind ) = @_;
-    my $home = cwd();
-    my $dir  = $self->store;
-    chdir $dir or die "Can't chdir to $dir: $!";
 
     local $_;    # Git::Sub seems to clobber $_ in list context
     my $re = $kind ? qr/ \Q$kind\E / : qr/ /;
     my @digests;
+
+    my $keeper = pushd $self->store;
 
     # the --batch-all-objects option appeared in v2.6.0-rc0
     if ( ge_git git::version, '2.6.0.rc0' ) {
@@ -101,54 +91,44 @@ sub all_digests {
           sort +git::rev_list '--all', '--objects';
     }
 
-    chdir $home or die "Can't chdir to $home: $!";
     return @digests;
 }
 
 # Git::Database::Role::ObjectWriter
 sub put_object {
     my ( $self, $object ) = @_;
-    my $home = cwd();
-    my $dir  = $self->store;
-    chdir $dir or die "Can't chdir to $dir: $!";
+    my $keeper = pushd $self->store;
+
     my $hash = git::hash_object
       '-w',
       '-t'      => $object->kind,
       '--stdin' => \$object->content;
-    chdir $home or die "Can't chdir to $home: $!";
     return $hash;
 }
 
 # Git::Database::Role::RefReader
 sub refs {
     my ($self) = @_;
-    my $home   = cwd();
-    my $dir    = $self->store;
-    chdir $dir or die "Can't chdir to $dir: $!";
+    my $keeper = pushd $self->store;
     local $_;    # Git::Sub seems to clobber $_ in list context
     my %digest = reverse map +( split / / ),
       git::show_ref '--head';
-    chdir $home or die "Can't chdir to $home: $!";
     return \%digest;
 }
 
 # Git::Database::Role::RefWriter
 sub put_ref {
     my ( $self, $refname, $digest ) = @_;
-    my $home = cwd();
-    my $dir  = $self->store;
-    chdir $dir or die "Can't chdir to $dir: $!";
+    my $keeper = pushd $self->store;
     git::update_ref( $refname, $digest );
-    chdir $home or die "Can't chdir to $home: $!";
+    return
 }
 
 sub delete_ref {
     my ( $self, $refname ) = @_;
-    my $home = cwd();
-    my $dir  = $self->store;
-    chdir $dir or die "Can't chdir to $dir: $!";
+    my $keeper = pushd $self->store;
     git::update_ref( '-d', $refname );
-    chdir $home or die "Can't chdir to $home: $!";
+    return
 }
 
 1;
