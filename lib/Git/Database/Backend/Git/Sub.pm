@@ -1,67 +1,61 @@
 package Git::Database::Backend::Git::Sub;
 
-use Cwd qw( cwd );
+use Cwd ();
+use Sub::Quote;
 use Git::Sub;
-use Git::Version::Compare qw( ge_git );
+use Git::Version::Compare ();
 
 use Moo;
 use namespace::clean;
-
-with
-  'Git::Database::Role::Backend',
-  'Git::Database::Role::ObjectReader',
-  'Git::Database::Role::ObjectWriter',
-  'Git::Database::Role::RefReader',
-  'Git::Database::Role::RefWriter',
-  ;
 
 # the store attribute is a directory name
 # or an object representing a directory
 # (e.g. Path::Class, Path::Tiny, File::Fu)
 
-# Git::Database::Role::Backend
-sub hash_object {
-    my ( $self, $object ) = @_;
-    my $home = cwd();
+# stuff used to generate subroutines
+my $package = 'Git::Database::Backend::Git::Sub';
+my $wrapper = q{
+    my $home = Cwd::cwd();
     my $dir  = $self->store;
     chdir $dir or die "Can't chdir to $dir: $!";
+    %s
+    chdir $home or die "Can't chdir to $home: $!";
+};
+
+# Git::Database::Role::Backend
+quote_sub "${package}::hash_object", q{
+    my ( $self, $object ) = @_;
+} . sprintf( $wrapper, q{
     my $hash = git::hash_object
       '-t'      => $object->kind,
       '--stdin' => \$object->content;
-    chdir $home or die "Can't chdir to $home: $!";
+} ) . q{
     return $hash;
-}
+};
 
 # Git::Database::Role::ObjectReader
-sub get_object_meta {
+quote_sub "${package}::get_object_meta", q{
     my ( $self, $digest ) = @_;
-    my $home = cwd();
-    my $dir  = $self->store;
-    chdir $dir or die "Can't chdir to $dir: $!";
+} . sprintf( $wrapper, q{
     my $meta = git::cat_file
       '--batch-check' => \"$digest\n";
-    chdir $home or die "Can't chdir to $home: $!";
-
+} ) . q{
     # protect against weird cases like if $digest contains a space
     my @parts = split / /, $meta;
     return ( $digest, 'missing', undef ) if $parts[-1] eq 'missing';
 
     my ( $kind, $size ) = splice @parts, -2;
     return join( ' ', @parts ), $kind, $size;
-}
+};
 
-sub get_object_attributes {
+quote_sub "${package}::get_object_attributes", q{
     my ( $self, $digest ) = @_;
-    my $home = cwd();
-    my $dir  = $self->store;
-    chdir $dir or die "Can't chdir to $dir: $!";
-
+} . sprintf( $wrapper, q{
     my $out = do {
         local $/;
         git::cat_file '--batch' => \"$digest\n";
     };
-    chdir $home or die "Can't chdir to $home: $!";
-
+} ) . q{
     my ( $meta, $content ) = split "\n", $out, 2;
 
     # protect against weird cases like if $digest contains a space
@@ -76,20 +70,17 @@ sub get_object_attributes {
         content    => substr( $content, 0, $size ),
         digest     => $sha1
     };
-}
+};
 
-sub all_digests {
+quote_sub "${package}::all_digests", q{
     my ( $self, $kind ) = @_;
-    my $home = cwd();
-    my $dir  = $self->store;
-    chdir $dir or die "Can't chdir to $dir: $!";
-
+} . sprintf( $wrapper, q{
     local $_;    # Git::Sub seems to clobber $_ in list context
     my $re = $kind ? qr/ \Q$kind\E / : qr/ /;
     my @digests;
 
     # the --batch-all-objects option appeared in v2.6.0-rc0
-    if ( ge_git git::version, '2.6.0.rc0' ) {
+    if ( Git::Version::Compare::ge_git git::version, '2.6.0.rc0' ) {
         @digests = map +( split / / )[0],
           grep /$re/,
           git::cat_file '--batch-check', '--batch-all-objects';
@@ -100,56 +91,53 @@ sub all_digests {
           git::cat_file '--batch-check', \join '', map +( split / / )[0] . "\n",
           sort +git::rev_list '--all', '--objects';
     }
-
-    chdir $home or die "Can't chdir to $home: $!";
+} ) . q{
     return @digests;
-}
+};
 
 # Git::Database::Role::ObjectWriter
-sub put_object {
+quote_sub "${package}::put_object", q{
     my ( $self, $object ) = @_;
-    my $home = cwd();
-    my $dir  = $self->store;
-    chdir $dir or die "Can't chdir to $dir: $!";
+} . sprintf( $wrapper, q{
     my $hash = git::hash_object
       '-w',
       '-t'      => $object->kind,
       '--stdin' => \$object->content;
-    chdir $home or die "Can't chdir to $home: $!";
+} ) . q{
     return $hash;
-}
+};
 
 # Git::Database::Role::RefReader
-sub refs {
+quote_sub "${package}::refs", q{
     my ($self) = @_;
-    my $home   = cwd();
-    my $dir    = $self->store;
-    chdir $dir or die "Can't chdir to $dir: $!";
+} . sprintf( $wrapper, q{
     local $_;    # Git::Sub seems to clobber $_ in list context
     my %digest = reverse map +( split / / ),
       git::show_ref '--head';
-    chdir $home or die "Can't chdir to $home: $!";
+} ) . q{
     return \%digest;
-}
+};
 
 # Git::Database::Role::RefWriter
-sub put_ref {
+quote_sub "${package}::put_ref", q{
     my ( $self, $refname, $digest ) = @_;
-    my $home = cwd();
-    my $dir  = $self->store;
-    chdir $dir or die "Can't chdir to $dir: $!";
+} . sprintf( $wrapper, q{
     git::update_ref( $refname, $digest );
-    chdir $home or die "Can't chdir to $home: $!";
-}
+} );
 
-sub delete_ref {
+quote_sub "${package}::delete_ref", q{
     my ( $self, $refname ) = @_;
-    my $home = cwd();
-    my $dir  = $self->store;
-    chdir $dir or die "Can't chdir to $dir: $!";
+} . sprintf( $wrapper, q{
     git::update_ref( '-d', $refname );
-    chdir $home or die "Can't chdir to $home: $!";
-}
+} );
+
+with
+  'Git::Database::Role::Backend',
+  'Git::Database::Role::ObjectReader',
+  'Git::Database::Role::ObjectWriter',
+  'Git::Database::Role::RefReader',
+  'Git::Database::Role::RefWriter',
+  ;
 
 1;
 
