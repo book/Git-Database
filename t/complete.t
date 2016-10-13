@@ -13,7 +13,6 @@ my @roles = qw(
 );
 
 my @todo = qw(
-  Git::PurePerl-RefReader
   Git::PurePerl-RefWriter
 );
 
