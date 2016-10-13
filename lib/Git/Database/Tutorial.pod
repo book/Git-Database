@@ -61,6 +61,31 @@ A reference (tag or branch) in the Git repository.
 
 =back
 
+=head1 HOW TO
+
+=head2 Obtain a Git::Database object from an existing repository
+
+The L<Git::Database> module is really a simple factory class that returns
+L</backend> objects. The actual backend class depends on the Git wrapper
+module used to access the Git repository.
+
+The generic way is:
+
+    # $r is an instance of some Perl Git wrapper
+    my $db = Git::Database->new( store => $r );
+
+For example, if C<$r> is a L<Git::Repository> object, C<$db> is going
+to be a L<Git::Database::Backend::Git::Repository> object.
+
+L<Git::Sub> is a special backend, as it's the only one that does not
+provide an object-oriented interface. When given a L</store> that does
+not the L<Git::Database::Role::Backend> role, L<Git::Database> assumes
+it's a directory name, and creates a L<Git::Database::Backend::Git::Sub>
+object to handle it.
+
+For the moment, there is no way to perform an "automatic selection"
+of the backend based on what's available.
+
 =head1 AUTHOR
 
 Philippe Bruhat (BooK) <book@cpan.org>.
