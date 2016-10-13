@@ -94,7 +94,7 @@ sub get_object_attributes {
     warn $bang if $bang;
 
     # object does not exist in the git object database
-    return if $parts[-1] eq 'missing';
+    return undef if $parts[-1] eq 'missing';
 
     # read the whole content in memory at once
     my $res = read $out, (my $content), $size;

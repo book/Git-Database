@@ -53,9 +53,17 @@ test_kind(
         # pick some random sha1 and check it's not in the empty repository
         if ($is_reader) {
             my $sha1 = join '', map sprintf( '%02x', rand 256 ), 1 .. 20;
-            is( $nil->has_object($sha1), '', "Database does not have $sha1" );
+            is( $nil->has_object($sha1), '', "has_object fails with $sha1" );
             is( $nil->get_object($sha1),
-                undef, "Database can't get an object for $sha1" );
+                undef, "get_object fails with $sha1 (scalar context)" );
+            is_deeply( [ $nil->get_object($sha1) ],
+                [undef], "get_object fails with $sha1 (list context)" );
+            is( $nil->get_object_attributes($sha1),
+                undef,
+                "get_object_attributes fails with $sha1 (scalar context)" );
+            is_deeply( [ $nil->get_object_attributes($sha1) ],
+                [undef],
+                "get_object_attributes fails with $sha1 (list context)" );
         }
 
         my %nil_contains;

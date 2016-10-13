@@ -59,7 +59,7 @@ sub get_object_attributes {
     my ( $sha1, $kind, $size ) = my @parts = split / /, $meta;
 
     # object does not exist in the git object database
-    return if $parts[-1] eq 'missing';
+    return undef if $parts[-1] eq 'missing';
 
     return {
         kind       => $kind,
