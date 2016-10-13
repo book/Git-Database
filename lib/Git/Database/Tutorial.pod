@@ -86,6 +86,17 @@ object to handle it.
 For the moment, there is no way to perform an "automatic selection"
 of the backend based on what's available.
 
+=head2 Create a new repository using Git::Database
+
+This is outside of the realm of L<Git::Database>, since it must be handed
+an existing L</store> object.
+
+The L<Git::Repository::Tutorial> documentation has detailed examples
+of how to L<create|Git::Repository::Tutorial/"Create a new repository">
+or L<clone|Git::Repository::Tutorial/"Clone a repository"> a new repository.
+
+The resulting object can then be passed to C<< Git::Database->new >>.
+
 =head1 AUTHOR
 
 Philippe Bruhat (BooK) <book@cpan.org>.
