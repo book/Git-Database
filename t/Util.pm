@@ -72,6 +72,7 @@ my %builder_for = (
     'None' => sub { '' },    # ignored by Git::Database::Backend::None
     'Git::PurePerl'   => sub { Git::PurePerl->new( directory   => shift ); },
     'Git::Repository' => sub { Git::Repository->new( work_tree => shift ); },
+    'Git::Sub'        => sub { shift },
 );
 
 sub store_for { return $builder_for{ $_[0] }->( $_[1] ); }
