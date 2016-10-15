@@ -1,5 +1,10 @@
 package Git::Database::Role::ObjectReader;
 
+use Git::Database::Object::Blob;
+use Git::Database::Object::Tree;
+use Git::Database::Object::Commit;
+use Git::Database::Object::Tag;
+
 use Moo::Role;
 
 requires
@@ -25,7 +30,9 @@ sub get_object_meta {
 sub get_object {
     my ( $self, $digest ) = @_;
     my $attr = $self->get_object_attributes($digest);
-    return $attr && $self->create_object( $attr );
+    return $attr
+      && "Git::Database::Object::\u$attr->{kind}"
+      ->new( %$attr, backend => $self );
 }
 
 1;
