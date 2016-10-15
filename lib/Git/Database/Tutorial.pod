@@ -109,6 +109,31 @@ or L<clone|Git::Repository::Tutorial/"Clone a repository"> a new repository.
 
 The resulting object can then be passed to C<< Git::Database->new >>.
 
+=head2 Create a Git object
+
+There are two ways to create a Git object (doing the
+L<Git::Database::Role::Object> role), with subtle differences between them.
+
+=over 4
+
+=item using the class directly
+
+    my $blob = Git::Database::Object::Blob->new( content => "Hello, world!" );
+
+    $blob->isa('Git::Database::Object::Blob');    # true
+    $blob->has_backend;                           # false
+    $blob->digest;    # use hash_object() from Git::Database::Role::Backend
+
+=item using the backend
+
+    my $blob = $backend->create_object( content => "Hello, world!" );
+
+    $blob->isa('Git::Database::Object::Blob');    # true
+    $blob->has_backend;                           # true
+    $blob->digest;    # use hash_object from $backend (might be faster)
+
+=back
+
 =head1 AUTHOR
 
 Philippe Bruhat (BooK) <book@cpan.org>.
