@@ -97,6 +97,7 @@ __END__
   get_object_meta
   all_digests
   put_object
+  refs
 
 =head1 NAME
 
@@ -121,7 +122,8 @@ This backend does the following roles
 (check their documentation for a list of supported methods):
 L<Git::Database::Role::Backend>,
 L<Git::Database::Role::ObjectReader>,
-L<Git::Database::Role::ObjectWriter>.
+L<Git::Database::Role::ObjectWriter>,
+L<Git::Database::Role::RefReader>.
 
 =head1 AUTHOR
 
