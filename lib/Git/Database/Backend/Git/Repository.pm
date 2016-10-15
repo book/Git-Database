@@ -61,7 +61,7 @@ sub get_object_meta {
     # git error messages
     my $bang;
     my $select = IO::Select->new( my $err = $checker->stderr );
-    $bang .= $checker->getline while $select->can_read(0);
+    $bang .= $err->getline while $select->can_read(0);
     warn $bang if $bang;
 
     # protect against weird cases like if $digest contains a space
@@ -94,7 +94,7 @@ sub get_object_attributes {
     warn $bang if $bang;
 
     # object does not exist in the git object database
-    return if $parts[-1] eq 'missing';
+    return undef if $parts[-1] eq 'missing';
 
     # read the whole content in memory at once
     my $res = read $out, (my $content), $size;
@@ -124,11 +124,25 @@ sub get_object_attributes {
 
 sub all_digests {
     my ( $self, $kind ) = @_;
+    my $store = $self->store;
     my $re = $kind ? qr/ \Q$kind\E / : qr/ /;
 
-    return map +( split / / )[0],
-      grep /$re/,
-      $self->store->run(qw( cat-file --batch-check --batch-all-objects ));
+    # the --batch-all-objects option appeared in v2.6.0-rc0
+    if ( $store->version_ge('2.6.0.rc0') ) {
+        return map +( split / / )[0],
+          grep /$re/,
+          $store->run(qw( cat-file --batch-check --batch-all-objects ));
+    }
+    else {    # this won't return unreachable objects
+        my $batch = $store->command(qw( cat-file --batch-check ));
+        my ( $stdin, $stdout ) = ( $batch->stdin, $batch->stdout );
+        my @digests =
+          map +( split / / )[0], grep /$re/,
+          map { print {$stdin} ( split / / )[0], "\n"; $stdout->getline }
+          sort $store->run(qw( rev-list --all --objects ));
+        $batch->close;
+        return @digests;
+    }
 }
 
 # Git::Database::Role::ObjectWriter

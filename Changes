@@ -2,6 +2,12 @@ Revision history for Git-Database
 
 {{$NEXT}}
 
+0.002 2016-10-13 BOOK
+    - New backend: Git::Sub
+    - Drop List::Util uniq from the tests (depends on a too recent version)
+    - Catch error messages from git and forward them as warnings
+    - Provide an implementation of all_digests() for older gits
+
 0.001 2016-09-27 BOOK
     - Git::Database provides an OO interface to the Git object database
       (similar to Git::PurePerl, but with a choice of backends for interacting

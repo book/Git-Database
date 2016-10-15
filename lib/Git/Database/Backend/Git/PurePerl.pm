@@ -1,6 +1,7 @@
 package Git::Database::Backend::Git::PurePerl;
 
 use Sub::Quote;
+use Path::Class qw( file );    # used by Git::PurePerl
 
 use Git::Database::Object::Raw;
 
@@ -11,6 +12,7 @@ with
   'Git::Database::Role::Backend',
   'Git::Database::Role::ObjectReader',
   'Git::Database::Role::ObjectWriter',
+  'Git::Database::Role::RefReader',
   ;
 
 has '+store' => (
@@ -20,6 +22,7 @@ has '+store' => (
     } ),
 );
 
+# Git::Database::Role::ObjectReader
 sub get_object_attributes {
     my ( $self, $digest ) = @_;
 
@@ -56,10 +59,30 @@ sub all_digests {
     return map $_->sha1, grep $_->kind eq $kind, $self->store->all_objects->all;
 }
 
+# Git::Database::Role::ObjectWriter
 sub put_object {
     my ( $self, $object ) = @_;
     $self->store->loose->put_object( Git::Database::Object::Raw->new($object) );
     return $object->digest;
+}
+
+# Git::Database::Role::RefReader
+sub refs {
+    my $store = $_[0]->store;
+    my %refs = ( HEAD => $store->ref_sha1('HEAD') );
+    @refs{ $store->ref_names } = $store->refs_sha1;
+
+    # get back to packed-refs to pick the primary target of the refs,
+    # since Git::PurePerl's ref_sha1 peels everything to reach the commit
+    if ( -f ( my $packed_refs = file( $store->gitdir, 'packed-refs' ) ) ) {
+        for my $line ( $packed_refs->slurp( chomp => 1 ) ) {
+            next if $line =~ /^[#^]/;
+            my ( $sha1, $name ) = split ' ', $line;
+            $refs{$name} = $sha1;
+        }
+    }
+
+    return \%refs;
 }
 
 1;
@@ -74,6 +97,7 @@ __END__
   get_object_meta
   all_digests
   put_object
+  refs
 
 =head1 NAME
 
@@ -98,7 +122,8 @@ This backend does the following roles
 (check their documentation for a list of supported methods):
 L<Git::Database::Role::Backend>,
 L<Git::Database::Role::ObjectReader>,
-L<Git::Database::Role::ObjectWriter>.
+L<Git::Database::Role::ObjectWriter>,
+L<Git::Database::Role::RefReader>.
 
 =head1 AUTHOR
 

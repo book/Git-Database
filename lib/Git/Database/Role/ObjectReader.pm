@@ -27,18 +27,12 @@ sub get_object_meta {
       : ( $digest, 'missing', undef );
 }
 
-my %kind2class = (
-    blob   => 'Git::Database::Object::Blob',
-    tree   => 'Git::Database::Object::Tree',
-    commit => 'Git::Database::Object::Commit',
-    tag    => 'Git::Database::Object::Tag',
-);
-
 sub get_object {
     my ( $self, $digest ) = @_;
     my $attr = $self->get_object_attributes($digest);
     return $attr
-      && $kind2class{ $attr->{kind} }->new( %$attr, backend => $self );
+      && "Git::Database::Object::\u$attr->{kind}"
+      ->new( %$attr, backend => $self );
 }
 
 1;
@@ -157,6 +151,9 @@ Otherwise return the C<undef> value.
 Return all the digests contained in the Git object database.
 If a L<kind|Git::Database::Role::Object/kind> argument is provided,
 only return the digests for that specific object kind.
+
+Depending on the underlying implementation, this may return unreachable
+objects.
 
 =head1 AUTHOR
 

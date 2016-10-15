@@ -53,9 +53,17 @@ test_kind(
         # pick some random sha1 and check it's not in the empty repository
         if ($is_reader) {
             my $sha1 = join '', map sprintf( '%02x', rand 256 ), 1 .. 20;
-            is( $nil->has_object($sha1), '', "Database does not have $sha1" );
+            is( $nil->has_object($sha1), '', "has_object fails with $sha1" );
             is( $nil->get_object($sha1),
-                undef, "Database can't get an object for $sha1" );
+                undef, "get_object fails with $sha1 (scalar context)" );
+            is_deeply( [ $nil->get_object($sha1) ],
+                [undef], "get_object fails with $sha1 (list context)" );
+            is( $nil->get_object_attributes($sha1),
+                undef,
+                "get_object_attributes fails with $sha1 (scalar context)" );
+            is_deeply( [ $nil->get_object_attributes($sha1) ],
+                [undef],
+                "get_object_attributes fails with $sha1 (list context)" );
         }
 
         my %nil_contains;
@@ -66,16 +74,19 @@ test_kind(
                 $test->{desc},
                 sub {
 
-                    # this test computes the digest
                     for my $args ( $args_for{$kind}->($test) ) {
 
-                        my $object =
-                          "Git::Database::Object::\u$kind"->new(@$args);
-
-                        is( $nil->hash_object($object),
-                            $test->{digest}, "hash_object: $test->{digest}" );
-
-                        cmp_git_objects( $object, $test );
+                        # various ways to create an object
+                        for my $object (
+                            "Git::Database::Object::\u$kind"->new(@$args),
+                            $nil->create_object( kind => $kind, @$args )
+                          )
+                        {
+                            is( $nil->hash_object($object),
+                                $test->{digest},
+                                "hash_object: $test->{digest}" );
+                            cmp_git_objects( $object, $test );
+                        }
                     }
 
                     done_testing;

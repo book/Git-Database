@@ -1,5 +1,10 @@
 package Git::Database::Role::Backend;
 
+use Git::Database::Object::Blob;
+use Git::Database::Object::Tree;
+use Git::Database::Object::Commit;
+use Git::Database::Object::Tag;
+
 use Moo::Role;
 
 has store => (
@@ -12,6 +17,31 @@ sub hash_object {
     my ( $self, $object ) = @_;
     return Digest::SHA->new->add( $object->kind, ' ', $object->size, "\0",
         $object->content )->hexdigest;
+}
+
+my %kind2class = (
+    blob   => 'Git::Database::Object::Blob',
+    tree   => 'Git::Database::Object::Tree',
+    commit => 'Git::Database::Object::Commit',
+    tag    => 'Git::Database::Object::Tag',
+);
+
+sub create_object {
+    my $self  = shift;
+    my $class = ref $self;
+
+    # inspired by Moo::Object::BUILDARGS
+    my %attr = @_ == 1
+      ? defined $_[0] && ref $_[0] eq 'HASH'
+          ? %{ $_[0] }
+          : die "Single parameters to create_object() must be a HASH ref"
+          . " data => " . $_[0] . "\n"
+      : @_ % 2
+          ? die "The create_object() method for $class expects a hash reference"
+          . " or a key/value list. You passed an odd number of arguments\n"
+          : @_;
+
+    return $kind2class{ $attr{kind} }->new( %attr, backend => $self );
 }
 
 1;
@@ -73,6 +103,26 @@ shortcut and call C<< $object->digest >>.
 
 The role provides a Perl implementation for it, but most backends will
 want to override it for performance reasons.
+
+=head2 create_object
+
+    # argument is a HASH reference
+    my $object = $store->create_object( \%attr );
+
+    # arguments is a list of pairs
+    my $object = $store->create_object( %attr );
+
+Return an object instance of an object doing the
+L<Git::Database::Role::Object> role, or C<undef> if C<kind> is unknown
+or not provided.
+
+This method assumes the provided attribute values are consistent for the
+object kind. B<Behaviour is undefined if the various attributes are not
+internally consistent.> (E.g. if the size does not match the content.)
+
+Note: this method creates new objects, but does not store them in
+the underlying Git datatase. Do save them in the database, use
+L<Git::Database::Role::Object::Writer/put_object>.
 
 =head1 AUTHOR
 
