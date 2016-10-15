@@ -1,6 +1,13 @@
 package Git::Database::Backend::Git::Sub;
 
-use Git::Sub;
+use Git::Sub qw(
+   cat_file
+   hash_object
+   rev_list
+   show_ref
+   update_ref
+   version
+);
 use Git::Version::Compare qw( ge_git );
 use File::pushd qw( pushd );
 
