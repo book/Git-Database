@@ -1,10 +1,5 @@
 package Git::Database::Role::ObjectReader;
 
-use Git::Database::Object::Blob;
-use Git::Database::Object::Tree;
-use Git::Database::Object::Commit;
-use Git::Database::Object::Tag;
-
 use Moo::Role;
 
 requires
@@ -27,18 +22,10 @@ sub get_object_meta {
       : ( $digest, 'missing', undef );
 }
 
-my %kind2class = (
-    blob   => 'Git::Database::Object::Blob',
-    tree   => 'Git::Database::Object::Tree',
-    commit => 'Git::Database::Object::Commit',
-    tag    => 'Git::Database::Object::Tag',
-);
-
 sub get_object {
     my ( $self, $digest ) = @_;
     my $attr = $self->get_object_attributes($digest);
-    return $attr
-      && $kind2class{ $attr->{kind} }->new( %$attr, backend => $self );
+    return $attr && $self->create_object( $attr );
 }
 
 1;
