@@ -104,6 +104,26 @@ shortcut and call C<< $object->digest >>.
 The role provides a Perl implementation for it, but most backends will
 want to override it for performance reasons.
 
+=head2 create_object
+
+    # argument is a HASH reference
+    my $object = $store->create_object( \%attr );
+
+    # arguments is a list of pairs
+    my $object = $store->create_object( %attr );
+
+Return an object instance of an object doing the
+L<Git::Database::Role::Object> role, or C<undef> if C<kind> is unknown
+or not provided.
+
+This method assumes the provided attribute values are consistent for the
+object kind. B<Behaviour is undefined if the various attributes are not
+internally consistent.> (E.g. if the size does not match the content.)
+
+Note: this method creates new objects, but does not store them in
+the underlying Git datatase. Do save them in the database, use
+L<Git::Database::Role::Object::Writer/put_object>.
+
 =head1 AUTHOR
 
 Philippe Bruhat (BooK) <book@cpan.org>
