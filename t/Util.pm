@@ -16,7 +16,7 @@ use Git::Database::Object::Tag;
 
 use Git::Database::Backend::None;
 
-my @kinds = qw( blob tree commit tag );
+our @kinds = qw( blob tree commit tag );
 
 # all the following functions will end up in the caller's namespace
 
@@ -30,7 +30,7 @@ sub objects_from {
     my $objects = do $perl;
 
     # add extra information
-    for my $kind ( keys %$objects ) {
+    for my $kind ( @kinds ) {
         for my $object ( @{ $objects->{$kind} } ) {
             $object->{kind} = $kind;
             $object->{desc} ||= join ' ', $object->{kind}, $object->{digest};
@@ -70,7 +70,9 @@ sub empty_repository {
 # build a store from a repository directory
 my %builder_for = (
     'None' => sub { '' },    # ignored by Git::Database::Backend::None
+    'Git::PurePerl'   => sub { Git::PurePerl->new( directory   => shift ); },
     'Git::Repository' => sub { Git::Repository->new( work_tree => shift ); },
+    'Git::Sub'        => sub { shift },
     'Git::Wrapper'    => sub { Git::Wrapper->new( shift ); },
 );
 
@@ -90,18 +92,18 @@ for my $file ( glob File::Spec->catfile(qw( t bundles * )) ) {
 }
 
 sub available_objects {
-    return grep exists $test_data{$_}{'.perl'}, keys %test_data;
+    return grep exists $test_data{$_}{'.perl'}, sort keys %test_data;
 }
 
 sub available_bundles {
-    return grep exists $test_data{$_}{'.bundle'}, keys %test_data;
+    return grep exists $test_data{$_}{'.bundle'}, sort keys %test_data;
 }
 
 sub available_backends {
     return 'None',    # always available
       map eval { Module::Runtime::use_module($_) },
       grep !/^None$/,
-      keys %builder_for;
+      sort keys %builder_for;
 }
 
 sub bundle_for { return $test_data{ $_[0] }{'.bundle'} }
@@ -149,7 +151,7 @@ my %cmp_for = (
 
         # can't use is_deeply here
         my $tag_info = $tag->tag_info;
-        for my $attr (qw( object type tag tagged_time comment )) {
+        for my $attr (qw( object type tag tagger_time comment )) {
             is( $tag_info->{$attr}, $test->{tag_info}{$attr},
                 "= tag_info.$attr" );
         }

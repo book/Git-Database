@@ -1,12 +1,13 @@
 package Git::Database::Object::Tag;
 
-use Moo;
-
-with 'Git::Database::Role::Object';
-
 use Git::Database::Actor;
 use DateTime;
 use Encode qw( decode );
+
+use Moo;
+use namespace::clean;
+
+with 'Git::Database::Role::Object';
 
 sub kind {'tag'}
 
@@ -16,13 +17,19 @@ has tag_info => (
     predicate => 1,
 );
 
+sub BUILD {
+    my ($self) = @_;
+    die "One of 'digest' or 'content' or 'tag_info' is required"
+      if !$self->has_digest && !$self->has_content && !$self->has_tag_info;
+}
+
 for my $attr (
     qw(
     object
     type
     tag
     tagger
-    tagged_time
+    tagger_date
     comment
     )
     )
@@ -45,7 +52,7 @@ sub _build_tag_info {
                 name => join( ' ', @data ),
                 email => substr( $email, 1, -1 )
             );
-            $tag_info->{tagged_time} = DateTime->from_epoch(
+            $tag_info->{tagger_date} = DateTime->from_epoch(
                 epoch     => $epoch,
                 time_zone => $tz
             );
@@ -69,8 +76,8 @@ sub _build_content {
     $content .= join(
         ' ',
         tagger => $self->tagger->ident,
-        $self->tagged_time->epoch,
-        DateTime::TimeZone->offset_as_string( $self->tagged_time->offset )
+        $self->tagger_date->epoch,
+        DateTime::TimeZone->offset_as_string( $self->tagger_date->offset )
     ) . "\n";
     $content .= "\n";
     my $comment = $self->comment;
@@ -82,7 +89,17 @@ sub _build_content {
 
 1;
 
-# ABSTRACT: A tag object in the Git database
+__END__
+
+=pod
+
+=for Pod::Coverage
+  BUILD
+  has_tag_info
+
+=head1 NAME
+
+Git::Database::Object::Tag - A tag object in the Git database
 
 =head1 SYNOPSIS
 
@@ -102,6 +119,9 @@ Git::Database::Object::Tag represents a C<tag> object
 obtained via L<Git::Database> from a Git object database.
 
 =head1 ATTRIBUTES
+
+All major attributes (L</digest>, L</content>, L</size>, L</tag_info>)
+have a predicate method.
 
 =head2 kind
 
@@ -141,7 +161,7 @@ The tag name.
 A L<Git::Database::Actor> object representing the author of
 the tag.
 
-=head2 tagged_time
+=head2 tagger_date
 
 A L<DateTime> object representing the date at which the author
 created the tag.
@@ -160,7 +180,7 @@ One (and only one) of the C<content> or C<tag> arguments is
 required.
 
 C<tag_info> is a reference to a hash containing the keys listed
-above, i.e.  C<object>, C<type>, C<tag>, C<tagger>, C<tagged_time>,
+above, i.e.  C<object>, C<type>, C<tag>, C<tagger>, C<tagger_time>,
 and C<comment>.
 
 =head1 SEE ALSO
@@ -168,9 +188,13 @@ and C<comment>.
 L<Git::Database>,
 L<Git::Database::Role::Object>.
 
+=head1 AUTHOR
+
+Philippe Bruhat (BooK) <book@cpan.org>.
+
 =head1 COPYRIGHT
 
-Copyright 2013 Philippe Bruhat (BooK), all rights reserved.
+Copyright 2013-2016 Philippe Bruhat (BooK), all rights reserved.
 
 =head1 LICENSE
 

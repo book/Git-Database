@@ -1,6 +1,7 @@
 package Git::Database::Object::Tree;
 
 use Moo;
+use namespace::clean;
 
 with 'Git::Database::Role::Object';
 
@@ -18,6 +19,11 @@ has directory_entries => (
 
 sub BUILD {
     my ($self) = @_;
+
+    die "One of 'digest' or 'content' or 'directory_entries' is required"
+      if !$self->has_digest
+      && !$self->has_content
+      && !$self->has_directory_entries;
 
     # sort directory entries
     $self->_set_directory_entries(
@@ -66,9 +72,15 @@ sub as_string {
 
 1;
 
-# ABSTRACT: A tree object in the Git object database
+=pod
 
-=for Pod::Coverage::TrustPod BUILD
+=for Pod::Coverage
+  BUILD
+  has_directory_entries
+
+=head1 NAME
+
+Git::Database::Object::Tree - A tree object in the Git object database
 
 =head1 SYNOPSIS
 
@@ -86,6 +98,8 @@ Git::Database::Object::Tree represents a C<tree> object
 obtained via L<Git::Database> from a Git object database.
 
 =head1 ATTRIBUTES
+
+All attributes have a predicate method.
 
 =head2 kind
 
@@ -130,9 +144,13 @@ The content of the tree object, in the format returned by C<git ls-tree>.
 L<Git::Database>,
 L<Git::Database::Role::Object>.
 
+=head1 AUTHOR
+
+Philippe Bruhat (BooK) <book@cpan.org>.
+
 =head1 COPYRIGHT
 
-Copyright 2013 Philippe Bruhat (BooK), all rights reserved.
+Copyright 2013-2016 Philippe Bruhat (BooK), all rights reserved.
 
 =head1 LICENSE
 

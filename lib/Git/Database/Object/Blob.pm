@@ -1,14 +1,30 @@
 package Git::Database::Object::Blob;
 
 use Moo;
+use namespace::clean;
 
 with 'Git::Database::Role::Object';
 
 sub kind { 'blob' }
 
+sub BUILD {
+    my ($self) = @_;
+    die "One of 'digest' or 'content' is required"
+      if !$self->has_digest && !$self->has_content;
+}
+
 1;
 
-# ABSTRACT: A blob object in the Git object database
+__END__
+
+=pod
+
+=for Pod::Coverage
+  BUILD
+
+=head1 NAME
+
+Git::Database::Object::Blob - A blob object in the Git object database
 
 =head1 SYNOPSIS
 
@@ -61,9 +77,13 @@ Same as C<content()>.
 L<Git::Database>,
 L<Git::Database::Role::Object>.
 
+=head1 AUTHOR
+
+Philippe Bruhat (BooK) <book@cpan.org>.
+
 =head1 COPYRIGHT
 
-Copyright 2013 Philippe Bruhat (BooK), all rights reserved.
+Copyright 2013-2016 Philippe Bruhat (BooK), all rights reserved.
 
 =head1 LICENSE
 

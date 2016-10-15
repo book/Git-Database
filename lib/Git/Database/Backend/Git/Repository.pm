@@ -1,5 +1,6 @@
 package Git::Database::Backend::Git::Repository;
 
+use IO::Select;
 use Sub::Quote;
 
 use Moo;
@@ -8,6 +9,9 @@ use namespace::clean;
 with
   'Git::Database::Role::Backend',
   'Git::Database::Role::ObjectReader',
+  'Git::Database::Role::ObjectWriter',
+  'Git::Database::Role::RefReader',
+  'Git::Database::Role::RefWriter',
   ;
 
 has '+store' => (
@@ -16,6 +20,7 @@ has '+store' => (
           if !eval { $_[0]->isa('Git::Repository') }
         # die version check
     } ),
+    default => sub { Git::Repository->new },
 );
 
 has object_factory => (
@@ -34,12 +39,14 @@ has object_checker => (
     clearer   => 1,
 );
 
+# Git::Database::Role::Backend
 sub hash_object {
     my ($self, $object ) = @_;
     return scalar $self->store->run( 'hash-object', '-t', $object->kind,
         '--stdin', { input => $object->content } );
 }
 
+# Git::Database::Role::ObjectReader
 sub get_object_meta {
     my ( $self, $digest ) = @_;
     my $checker = $self->object_checker;
@@ -50,6 +57,12 @@ sub get_object_meta {
     # process the reply
     local $/ = "\012";
     chomp( my $reply = $checker->stdout->getline );
+
+    # git error messages
+    my $bang;
+    my $select = IO::Select->new( my $err = $checker->stderr );
+    $bang .= $err->getline while $select->can_read(0);
+    warn $bang if $bang;
 
     # protect against weird cases like if $digest contains a space
     my @parts = split / /, $reply;
@@ -74,8 +87,14 @@ sub get_object_attributes {
     # protect against weird cases like if $sha1 contains a space
     my ( $sha1, $kind, $size ) = my @parts = split / /, $reply;
 
+    # git error messages
+    my $bang;
+    my $select = IO::Select->new( my $err = $factory->stderr );
+    $bang .= $err->getline while $select->can_read(0);
+    warn $bang if $bang;
+
     # object does not exist in the git object database
-    return if $parts[-1] eq 'missing';
+    return undef if $parts[-1] eq 'missing';
 
     # read the whole content in memory at once
     my $res = read $out, (my $content), $size;
@@ -105,11 +124,52 @@ sub get_object_attributes {
 
 sub all_digests {
     my ( $self, $kind ) = @_;
+    my $store = $self->store;
     my $re = $kind ? qr/ \Q$kind\E / : qr/ /;
 
-    return map +( split / / )[0],
-      grep /$re/,
-      $self->store->run(qw( cat-file --batch-check --batch-all-objects ));
+    # the --batch-all-objects option appeared in v2.6.0-rc0
+    if ( $store->version_ge('2.6.0.rc0') ) {
+        return map +( split / / )[0],
+          grep /$re/,
+          $store->run(qw( cat-file --batch-check --batch-all-objects ));
+    }
+    else {    # this won't return unreachable objects
+        my $batch = $store->command(qw( cat-file --batch-check ));
+        my ( $stdin, $stdout ) = ( $batch->stdin, $batch->stdout );
+        my @digests =
+          map +( split / / )[0], grep /$re/,
+          map { print {$stdin} ( split / / )[0], "\n"; $stdout->getline }
+          sort $store->run(qw( rev-list --all --objects ));
+        $batch->close;
+        return @digests;
+    }
+}
+
+# Git::Database::Role::ObjectWriter
+sub put_object {
+    my ( $self, $object ) = @_;
+    return scalar $self->store->run( 'hash-object', '-t', $object->kind,
+        '-w', '--stdin', { input => $object->content } );
+}
+
+# Git::Database::Role::RefReader
+sub refs {
+    my ($self) = @_;
+    return {
+        reverse map +( split / / ),
+        $self->store->run(qw( show-ref --head ))
+    };
+}
+
+# Git::Database::Role::RefWriter
+sub put_ref {
+    my ($self, $refname, $digest ) = @_;
+    $self->store->run( 'update-ref', $refname, $digest );
+}
+
+sub delete_ref {
+    my ($self, $refname ) = @_;
+    $self->store->run( 'update-ref', '-d', $refname );
 }
 
 sub DEMOLISH {
@@ -124,6 +184,21 @@ sub DEMOLISH {
 
 __END__
 
+=pod
+
+=for Pod::Coverage
+  has_object_checker
+  has_object_factory
+  DEMOLISH
+  hash_object
+  get_object_attributes
+  get_object_meta
+  all_digests
+  put_object
+  refs
+  put_ref
+  delete_ref
+
 =head1 NAME
 
 Git::Database::Backend::Git::Repository - A Git::Database backend based on Git::Repository
@@ -133,11 +208,7 @@ Git::Database::Backend::Git::Repository - A Git::Database backend based on Git::
     # get a store
     my $r  = Git::Repository->new();
 
-    # provide the backend
-    my $b  = Git::Database::Backend::Git::Repository->new( store => $r );
-    my $db = Git::Database->new( backend => $b );
-
-    # let Git::Database figure it out by itself
+    # let Git::Database produce the backend
     my $db = Git::Database->new( store => $r );
 
 =head1 DESCRIPTION
@@ -145,13 +216,22 @@ Git::Database::Backend::Git::Repository - A Git::Database backend based on Git::
 This backend reads and write data from a Git repository using the
 L<Git::Repository> Git wrapper.
 
+=head2 Git Database Roles
+
+This backend does the following roles
+(check their documentation for a list of supported methods):
+L<Git::Database::Role::Backend>,
+L<Git::Database::Role::ObjectReader>,
+L<Git::Database::Role::ObjectWriter>,
+L<Git::Database::Role::RefReader>.
+
 =head1 AUTHOR
 
 Philippe Bruhat (BooK) <book@cpan.org>
 
 =head1 COPYRIGHT
 
-Copyright 2013-2016 Philippe Bruhat (BooK), all rights reserved.
+Copyright 2016 Philippe Bruhat (BooK), all rights reserved.
 
 =head1 LICENSE
 

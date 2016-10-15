@@ -7,47 +7,29 @@ use t::Util;
 
 # a database with no store
 my $db = Git::Database->new();
-isa_ok( $db,          'Git::Database' );
-isa_ok( $db->backend, 'Git::Database::Backend::None' );
+ok(
+    $db->does('Git::Database::Role::Backend'),
+    'db does Git::Database::Role::Backend'
+);
 
 # test with
 my $dir = empty_repository;
 for my $backend ( available_backends() ) {
 
     # provide backend directly
-    $db = Git::Database->new( backend => backend_for( $backend, $dir ) );
-    isa_ok( $db,          'Git::Database' );
-    isa_ok( $db->backend, "Git::Database::Backend::$backend" );
-    isa_ok( $db->backend->store, $backend ) if $backend ne 'None';
+    $db = backend_for( $backend, $dir );
+    isa_ok( $db, "Git::Database::Backend::$backend" );
+    isa_ok( $db->store, $backend )
+      if $backend ne 'None' && $backend ne 'Git::Sub';
 
     # build backend from store
     $db = Git::Database->new( store => store_for( $backend, $dir ) );
-    isa_ok( $db,          'Git::Database' );
-    isa_ok( $db->backend, "Git::Database::Backend::$backend" );
-    isa_ok( $db->backend->store, $backend ) if $backend ne 'None';
+    isa_ok( $db, "Git::Database::Backend::$backend" );
+    isa_ok( $db->store, $backend )
+      if $backend ne 'None' && $backend ne 'Git::Sub';
 }
 
 # some error cases
-ok(
-    !eval { $db = Git::Database->new( backend => 'fail' ) },
-    'backend does not Git::Database::Role::Backend'
-);
-like(
-    $@,
-    qr/^isa check for "backend" failed: fail DOES not Git::Database::Role::Backend/,
-    '... expected error message'
-);
-
-ok(
-    !eval { $db = Git::Database->new( backend => 'backend', store => 'store' ) },
-    'backend and store are mutually exclusive'
-);
-like(
-    $@,
-    qr/^'store' and 'backend' attributes are mutually exclusive /,
-    '... expected error message'
-);
-
 ok(
     !eval { $db = Git::Database->new( store => bless( {}, 'Nope' ) ) },
     'Git::Database::Backend::Nope does not exist'

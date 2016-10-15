@@ -53,6 +53,12 @@ __END__
 
 =pod
 
+=for Pod::Coverage
+  has_backend
+  has_content
+  has_digest
+  has_size
+
 =head1 NAME
 
 Git::Database::Role::Object - Role for objects from the Git object database
@@ -78,17 +84,17 @@ database.
 When creating a new object meant to be added to the Git object database
 (via L<backend>), only the L</content> attribute is actually required.
 
-New objects are typically created via L<Git::Database>'s
-L<create_object|Git::Database/create_object> method, rathen than by
-calling C<new> directly. This is when the object data is fetched from
-the Git object database.
+New objects are typically created via L<Git::Database::Role::ObjectReader>'s
+L<get_object|Git::Database::Role::ObjectReader/get_object> method,
+rather than by calling C<new> directly. This is when the object data is
+fetched from the Git object database.
 
 =head1 ATTRIBUTES
 
 The L<content>, L<size> and L<digest> attribute are lazy, and can be
 computed from the others: L<size> from L<content>, L<content> from
 L<digest> (if the object exists in the backend store), and L<digest>
-from L<content>.
+from L<content>. All attributes have a predicate method.
 
 Additional attributes in some classes may add other ways to compute
 the content.
@@ -101,9 +107,7 @@ L<commit_info|Git::Database::Object::Commit/commit_info>, and
 L<tag_info|Git::Database::Object::Tag/tag_info>.
 
 For now, as soon as the L</content> of a Git::Database::Role::Object is
-needed, it is fully loaded in memory. In future releases, it is planned
-to add a feature where the content is available via a filehandle, so that
-it's never needed to have the whole object content in memory.
+needed, it is fully loaded in memory.
 
 =head2 backend
 
@@ -150,6 +154,10 @@ L<Git::Database::Object::Blob>,
 L<Git::Database::Object::Tree>,
 L<Git::Database::Object::Commit>,
 L<Git::Database::Object::Tag>.
+
+=head1 AUTHOR
+
+Philippe Bruhat (BooK) <book@cpan.org>.
 
 =head1 COPYRIGHT
 
