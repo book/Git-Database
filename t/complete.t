@@ -13,6 +13,7 @@ my @roles = qw(
 );
 
 my @todo = qw(
+  Git::PurePerl-RefWriter
 );
 
 for my $backend ( available_backends() ) {
