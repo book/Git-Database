@@ -74,16 +74,19 @@ test_kind(
                 $test->{desc},
                 sub {
 
-                    # this test computes the digest
                     for my $args ( $args_for{$kind}->($test) ) {
 
-                        my $object =
-                          "Git::Database::Object::\u$kind"->new(@$args);
-
-                        is( $nil->hash_object($object),
-                            $test->{digest}, "hash_object: $test->{digest}" );
-
-                        cmp_git_objects( $object, $test );
+                        # various ways to create an object
+                        for my $object (
+                            "Git::Database::Object::\u$kind"->new(@$args),
+                            $nil->create_object( kind => $kind, @$args )
+                          )
+                        {
+                            is( $nil->hash_object($object),
+                                $test->{digest},
+                                "hash_object: $test->{digest}" );
+                            cmp_git_objects( $object, $test );
+                        }
                     }
 
                     done_testing;
