@@ -77,6 +77,13 @@ The generic way is:
 For example, if C<$r> is a L<Git::Repository> object, C<$db> is going
 to be a L<Git::Database::Backend::Git::Repository> object.
 
+Example:
+
+    # use Git::Repository with a repository in the current working directory
+    my $db = Git::Database->new( store => Git::Reposutory->new );
+
+    $db->isa('Git::Database::Backend::Git::Repository');    # true
+
 L<Git::Sub> is a special backend, as it's the only one that does not
 provide an object-oriented interface. When given a L</store> that does
 not the L<Git::Database::Role::Backend> role, L<Git::Database> assumes
