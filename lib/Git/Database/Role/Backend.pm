@@ -19,13 +19,6 @@ sub hash_object {
         $object->content )->hexdigest;
 }
 
-my %kind2class = (
-    blob   => 'Git::Database::Object::Blob',
-    tree   => 'Git::Database::Object::Tree',
-    commit => 'Git::Database::Object::Commit',
-    tag    => 'Git::Database::Object::Tag',
-);
-
 sub create_object {
     my $self  = shift;
     my $class = ref $self;
@@ -41,7 +34,12 @@ sub create_object {
           . " or a key/value list. You passed an odd number of arguments\n"
           : @_;
 
-    return $kind2class{ $attr{kind} }->new( %attr, backend => $self );
+    # kind is required
+    die "Missing required arguments: kind"
+      if !exists $attr{kind} || !defined $attr{kind};
+
+    return
+      "Git::Database::Object::\u$attr{kind}"->new( %attr, backend => $self );
 }
 
 1;
