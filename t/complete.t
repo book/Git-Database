@@ -14,7 +14,6 @@ my @roles = qw(
 
 my @todo = qw(
   Git::PurePerl-RefWriter
-  Git::Wrapper-ObjectReader
   Git::Wrapper-ObjectWriter
   Git::Wrapper-RefReader
   Git::Wrapper-RefWriter
