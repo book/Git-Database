@@ -40,9 +40,10 @@ Git::Database::Object::Raw - Raw Git::Database objects
 
 =head1 DESCRIPTION
 
-This tiny class adds the L</sha1> and L</raw> methods to those offered by
-L<Git::Database::Role::Object>. Git::Database::Object::Raw objects can
-be handed to L<Git::PurePerl::Loose> for saving in the Git object database.
+This tiny class adds the L</sha1> and L</raw> methods to those offered
+by L<Git::Database::Role::Object>. Git::Database::Object::Raw objects
+can be handed to L<Git::PurePerl::Loose> or L<Cogit::Loose> for saving
+in the Git object database.
 
 =head1 METHODS
 
@@ -52,8 +53,8 @@ Alias for L<digest|Git::Database::Role::Object/digest>.
 
 =head2 raw
 
-Return the raw data, as used by L<Git::PurePerl::Loose> to save an object
-in the Git object database.
+Return the raw data, as used by L<Git::PurePerl::Loose> and
+L<Cogit::Loose> to save an object in the Git object database.
 
 =head1 AUTHOR
 
