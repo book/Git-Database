@@ -13,6 +13,7 @@ with
   'Git::Database::Role::ObjectReader',
   'Git::Database::Role::ObjectWriter',
   'Git::Database::Role::RefReader',
+  'Git::Database::Role::ExpandAbbrev',
   ;
 
 has '+store' => (
@@ -25,6 +26,11 @@ has '+store' => (
 # Git::Database::Role::ObjectReader
 sub get_object_attributes {
     my ( $self, $digest ) = @_;
+
+    # expand abbreviated digests
+    $digest = $self->expand_abbrev($digest)
+      or return undef
+      if $digest !~ /^[0-9a-f]{40}$/;
 
     # search packs
     for my $pack ( $self->store->packs ) {
