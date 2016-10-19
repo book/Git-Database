@@ -1,18 +1,12 @@
 package Git::Database::Backend::Cogit;
 
 use Sub::Quote;
-use Path::Class qw( file );    # used by Cogit
-
-use Git::Database::Object::Raw;
 
 use Moo;
 use namespace::clean;
 
 with
-  'Git::Database::Role::Backend',
-  'Git::Database::Role::ObjectReader',
-  'Git::Database::Role::ObjectWriter',
-  'Git::Database::Role::RefReader',
+  'Git::Database::Role::PurePerlBackend',
   ;
 
 has '+store' => (
@@ -22,68 +16,8 @@ has '+store' => (
     } ),
 );
 
-# Git::Database::Role::ObjectReader
-sub get_object_attributes {
-    my ( $self, $digest ) = @_;
-
-    # search packs
-    for my $pack ( @{ $self->store->packs } ) {
-        my ( $kind, $size, $content ) = $pack->get_object($digest);
-        if ( defined($kind) && defined($size) && defined($content) ) {
-            return {
-                kind    => $kind,
-                digest  => $digest,
-                content => $content,
-                size    => $size,
-            };
-        }
-    }
-
-    # search loose objects
-    my ( $kind, $size, $content ) = $self->store->loose->get_object($digest);
-    if ( defined($kind) && defined($size) && defined($content) ) {
-        return {
-            kind    => $kind,
-            digest  => $digest,
-            content => $content,
-            size    => $size,
-        };
-    }
-
-    return undef;
-}
-
-sub all_digests {
-    my ( $self, $kind ) = @_;
-    return $self->store->all_sha1s->all if !$kind;
-    return map $_->sha1, grep $_->kind eq $kind, $self->store->all_objects->all;
-}
-
-# Git::Database::Role::ObjectWriter
-sub put_object {
-    my ( $self, $object ) = @_;
-    $self->store->loose->put_object( Git::Database::Object::Raw->new($object) );
-    return $object->digest;
-}
-
-# Git::Database::Role::RefReader
-sub refs {
-    my $store = $_[0]->store;
-    my %refs = ( HEAD => $store->ref_sha1('HEAD') );
-    @refs{ $store->ref_names } = $store->refs_sha1;
-
-    # get back to packed-refs to pick the primary target of the refs,
-    # since Cogit's ref_sha1 peels everything to reach the commit
-    if ( -f ( my $packed_refs = file( $store->gitdir, 'packed-refs' ) ) ) {
-        for my $line ( $packed_refs->slurp( chomp => 1 ) ) {
-            next if $line =~ /^[#^]/;
-            my ( $sha1, $name ) = split ' ', $line;
-            $refs{$name} = $sha1;
-        }
-    }
-
-    return \%refs;
-}
+# Git::Database::Role::PurePerlBackend
+sub _store_packs { $_[0]->store->packs }
 
 1;
 
