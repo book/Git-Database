@@ -17,15 +17,28 @@ with
   'Git::Database::Role::ObjectReader',
   'Git::Database::Role::ObjectWriter',
   'Git::Database::Role::RefReader',
-  'Git::Database::Role::ExpandAbbrev',
   ;
+
+sub _expand_abbrev {
+    my ( $self, $abbrev ) = @_;
+
+    # some shortcuts
+    return ''         if !defined $abbrev;
+    return lc $abbrev if $abbrev =~ /^[0-9a-fA-F]{40}$/;
+    return ''         if length $abbrev < 4;
+
+    # basic implementation
+    my @matches = grep /^$abbrev/, $self->all_digests;
+    warn "error: short SHA1 $abbrev is ambiguous.\n" if @matches > 1;
+    return @matches == 1 ? shift @matches : '';
+}
 
 # Git::Database::Role::ObjectReader
 sub get_object_attributes {
     my ( $self, $digest ) = @_;
 
     # expand abbreviated digests
-    $digest = $self->expand_abbrev($digest)
+    $digest = $self->_expand_abbrev($digest)
       or return undef
       if $digest !~ /^[0-9a-f]{40}$/;
 
