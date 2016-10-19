@@ -213,10 +213,24 @@ test_backends(
             'all_digests( )'
         );
 
-        # one known case of ambiguous abbreviated digest
-        is( $backend->get_object('577ecc'),
-            undef, "get_object( ambiguous ) fails" )
-          if $source eq 'ambiguous';
+        # abbreviated digests
+        if ( $source eq 'ambiguous' ) {
+
+            # one known case of ambiguous abbreviated digest
+            is( $backend->get_object('577ecc'),
+                undef, "get_object( ambiguous ) fails" );
+        }
+        else {
+            my $digest = $objects->{commit}[0]{digest};
+            my $abbrev = substr( $digest, 0, 4 );
+
+            # get the object from the abbreviated id
+            my $object = $backend->get_object($abbrev);
+            ok( defined $object, "get_object( $abbrev )" );
+            is( $backend->get_object($abbrev)->digest,
+                $digest, "$abbrev -> $digest" )
+              if $object;
+        }
     },
     '*'    # all bundles, and an empty repository
 );
