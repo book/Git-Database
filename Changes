@@ -2,6 +2,12 @@ Revision history for Git-Database
 
 {{$NEXT}}
 
+0.003 2016-10-20 BOOK
+    - New backend: Git::PurePerl
+    - New backend: Cogit
+    - New backend method: create_object
+    - Fleshed out Git::Database::Tutorial a little
+
 0.002 2016-10-13 BOOK
     - New backend: Git::Sub
     - Drop List::Util uniq from the tests (depends on a too recent version)
