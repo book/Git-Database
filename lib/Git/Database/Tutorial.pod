@@ -88,7 +88,7 @@ to be a L<Git::Database::Backend::Git::Repository> object.
 Example:
 
     # use Git::Repository with a repository in the current working directory
-    my $db = Git::Database->new( store => Git::Reposutory->new );
+    my $db = Git::Database->new( store => Git::Repository->new );
 
     $db->isa('Git::Database::Backend::Git::Repository');    # true
 
