@@ -223,7 +223,8 @@ This backend does the following roles
 L<Git::Database::Role::Backend>,
 L<Git::Database::Role::ObjectReader>,
 L<Git::Database::Role::ObjectWriter>,
-L<Git::Database::Role::RefReader>.
+L<Git::Database::Role::RefReader>,
+L<Git::Database::Role::RefWriter>.
 
 =head1 AUTHOR
 
