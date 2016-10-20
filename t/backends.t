@@ -1,10 +1,11 @@
 use strict;
 use warnings;
 use Test::More;
-use List::Util qw( uniq );
 use Git::Database;
 
 use t::Util;
+
+our @kinds;    # set by t::Util
 
 # different object kinds work with different possible arguments
 my %args_for = (
@@ -42,9 +43,6 @@ test_kind(
         my $is_reader = $backend->does('Git::Database::Role::ObjectReader');
         my $is_writer = $backend->does('Git::Database::Role::ObjectWriter');
 
-        # a database for this backend
-        my $db = Git::Database->new( backend => $backend );
-
         # figure out the store class
         my $class = substr( ref $backend, 24 );  # drop Git::Database::Backend::
 
@@ -55,9 +53,17 @@ test_kind(
         # pick some random sha1 and check it's not in the empty repository
         if ($is_reader) {
             my $sha1 = join '', map sprintf( '%02x', rand 256 ), 1 .. 20;
-            is( $nil->has_object($sha1), '', "Database does not have $sha1" );
+            is( $nil->has_object($sha1), '', "has_object fails with $sha1" );
             is( $nil->get_object($sha1),
-                undef, "Database can't get an object for $sha1" );
+                undef, "get_object fails with $sha1 (scalar context)" );
+            is_deeply( [ $nil->get_object($sha1) ],
+                [undef], "get_object fails with $sha1 (list context)" );
+            is( $nil->get_object_attributes($sha1),
+                undef,
+                "get_object_attributes fails with $sha1 (scalar context)" );
+            is_deeply( [ $nil->get_object_attributes($sha1) ],
+                [undef],
+                "get_object_attributes fails with $sha1 (list context)" );
         }
 
         my %nil_contains;
@@ -68,16 +74,19 @@ test_kind(
                 $test->{desc},
                 sub {
 
-                    # this test computes the digest
                     for my $args ( $args_for{$kind}->($test) ) {
 
-                        my $object =
-                          "Git::Database::Object::\u$kind"->new(@$args);
-
-                        is( $nil->hash_object($object),
-                            $test->{digest}, "hash_object: $test->{digest}" );
-
-                        cmp_git_objects( $object, $test );
+                        # various ways to create an object
+                        for my $object (
+                            "Git::Database::Object::\u$kind"->new(@$args),
+                            $nil->create_object( kind => $kind, @$args )
+                          )
+                        {
+                            is( $nil->hash_object($object),
+                                $test->{digest},
+                                "hash_object: $test->{digest}" );
+                            cmp_git_objects( $object, $test );
+                        }
                     }
 
                     done_testing;
@@ -141,17 +150,17 @@ test_kind(
                 "$test->{desc} [found in its own repository]",
                 sub {
                     # has_object
-                    ok( $db->has_object($digest), "has_object( $digest )" );
+                    ok( $backend->has_object($digest), "has_object( $digest )" );
 
                     # get_object_meta
                     is_deeply(
-                        [ $db->get_object_meta($digest) ],
+                        [ $backend->get_object_meta($digest) ],
                         [ $digest, $kind, $test->{size} ],
                         "get_object_meta( $digest )"
                     );
 
                     # fetching the object
-                    cmp_git_objects( $db->get_object($digest), $test );
+                    cmp_git_objects( $backend->get_object($digest), $test );
 
                     # create the object with only the digest
                     cmp_git_objects(
@@ -186,9 +195,13 @@ test_backends(
         }
 
         my $objects = objects_from($source);
-        my %digests =
-          map +( $_ => [ uniq sort map $_->{digest}, @{ $objects->{$_} } ] ),
-          sort keys %$objects;
+        my %digests = map +(
+            $_ => do {
+                my %s;
+                [ grep !$s{$_}++, sort map $_->{digest}, @{ $objects->{$_} } ];
+              }
+          ),
+          @kinds;
 
         is_deeply( [ $backend->all_digests($_) ],
             $digests{$_}, "all_digests( $_ )" )
@@ -200,10 +213,24 @@ test_backends(
             'all_digests( )'
         );
 
-        # one known case of ambiguous abbreviated digest
-        is( $backend->get_object('577ecc'),
-            undef, "get_object( ambiguous ) fails" )
-          if $source eq 'ambiguous';
+        # abbreviated digests
+        if ( $source eq 'ambiguous' ) {
+
+            # one known case of ambiguous abbreviated digest
+            is( $backend->get_object('577ecc'),
+                undef, "get_object( ambiguous ) fails" );
+        }
+        else {
+            my $digest = $objects->{commit}[0]{digest};
+            my $abbrev = substr( $digest, 0, 4 );
+
+            # get the object from the abbreviated id
+            my $object = $backend->get_object($abbrev);
+            ok( defined $object, "get_object( $abbrev )" );
+            is( $backend->get_object($abbrev)->digest,
+                $digest, "$abbrev -> $digest" )
+              if $object;
+        }
     },
     '*'    # all bundles, and an empty repository
 );

@@ -1,7 +1,9 @@
 package Git::Database::DirectoryEntry;
 
-use Moo;
 use Sub::Quote;
+
+use Moo;
+use namespace::clean;
 
 # Git only uses the following (octal) modes:
 # - 040000 for subdirectory (tree)
@@ -54,7 +56,11 @@ sub is_submodule  { $_[0]->mode eq '160000' }
 
 __END__
 
-# ABSTRACT: A directory entry in Git
+=pod
+
+=head1 NAME
+
+Git::Database::DirectoryEntry - A directory entry in Git
 
 =head1 SYNOPSIS
 
@@ -151,9 +157,13 @@ a submodule. Note: a submodule is a blob.
 L<Git::Database>,
 L<Git::Database::Object::Tree>.
 
+=head1 AUTHOR
+
+Philippe Bruhat (BooK) <book@cpan.org>.
+
 =head1 COPYRIGHT
 
-Copyright 2013 Philippe Bruhat (BooK), all rights reserved.
+Copyright 2013-2016 Philippe Bruhat (BooK), all rights reserved.
 
 =head1 LICENSE
 

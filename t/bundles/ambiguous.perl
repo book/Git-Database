@@ -50,7 +50,7 @@ use Git::Database::DirectoryEntry;
                     name  => 'Philippe Bruhat (BooK)',
                     email => 'book@cpan.org',
                 ),
-                authored_time => DateTime->from_epoch(
+                author_date => DateTime->from_epoch(
                     epoch     => 1472317761,
                     time_zone => '+0200',
                 ),
@@ -58,7 +58,7 @@ use Git::Database::DirectoryEntry;
                     name  => 'Philippe Bruhat (BooK)',
                     email => 'book@cpan.org',
                 ),
-                committed_time => DateTime->from_epoch(
+                committer_date => DateTime->from_epoch(
                     epoch     => 1472317761,
                     time_zone => '+0200',
                 ),
@@ -74,4 +74,10 @@ The tree attached to this commit points to two blobs will ambiguous short SHA1
 COMMIT
         },
     ],
+    refs => {
+        'HEAD' => '9f0363e979a368db9748fb93278ab91a2152aa71',
+        'refs/heads/master' => '9f0363e979a368db9748fb93278ab91a2152aa71',
+        'refs/remotes/origin/HEAD' => '9f0363e979a368db9748fb93278ab91a2152aa71',
+        'refs/remotes/origin/master' => '9f0363e979a368db9748fb93278ab91a2152aa71',
+    },
 }

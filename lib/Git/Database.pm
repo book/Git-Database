@@ -1,47 +1,27 @@
 package Git::Database;
 
-use Sub::Quote;
 use Module::Runtime qw( use_module );
 
-use Moo;
+use Moo::Object ();
 use namespace::clean;
 
-has backend => (
-    is       => 'ro',
-    required => 1,
-    default  => sub { use_module('Git::Database::Backend::None')->new; },
-    isa      => sub {
-        die "$_[0] DOES not Git::Database::Role::Backend"
-          if !eval { $_[0]->does('Git::Database::Role::Backend') };
-    },
-    handles => [
-        'hash_object',        # Git::Database::Role::Backend
-        'get_object_meta',    # Git::Database::Role::ObjectReader
-        'get_object_attributes',
-        'get_object',
-        'get_hashes',
-        'has_object',
-        'all_digests',
-        'put_object',         # Git::Database::Role::ObjectWriter
-        'resolve_ref',        # Git::Database::Role::RefReader
-        'get_refs',
-        'put_ref',            # Git::Database::Role::RefWriter
-        'delete_ref'
-    ],
-);
-
-sub BUILDARGS {
+sub new {
     my $args = Moo::Object::BUILDARGS(@_);
 
-    die "'store' and 'backend' attributes are mutually exclusive"
-      if exists $args->{store} && exists $args->{backend};
-
+    # store: an object that gives actual access to a git repo
     if ( my $store = delete $args->{store} ) {
-        $args->{backend} = use_module( "Git::Database::Backend::" . ref $store )
-          ->new( store => $store );
+        if ( !ref $store || -d $store ) {
+            require Git::Database::Backend::Git::Sub;
+            return Git::Database::Backend::Git::Sub->new( store => $store );
+        }
+        else {
+            return use_module( "Git::Database::Backend::" . ref $store )
+              ->new( store => $store );
+        }
     }
 
-    return $args;
+    # some really basic default
+    return use_module('Git::Database::Backend::None')->new;
 }
 
 1;
@@ -59,11 +39,10 @@ Git::Database - Provide access to the Git object database
     # get a store
     my $r  = Git::Repository->new();
 
-    # provide the backend
-    my $b  = Git::Database::Backend::Git::Repository->new( store => $r );
-    my $db = Git::Database->new( backend => $b );
+    # build a backend to access the store
+    my $db = Git::Database::Backend::Git::Repository->new( store => $r );
 
-    # let Git::Database figure it out by itself
+    # or let Git::Database figure it out by itself
     my $db = Git::Database->new( store => $r );
 
 =head1 DESCRIPTION
@@ -72,26 +51,26 @@ Git::Database provides access from Perl to the object database stored
 in a Git repository. It can use any supported Git wrapper to access
 the Git object database maintained by Git.
 
-=head1 ATTRIBUTES
-
-=head2 backend
-
-An object doing the L<Git::Database::Role::Backend> role, used to access
-the data in the Git repository.
-
-If none is provided, defaults to using the very limited
-L<Git::Database::Backend::None>.
-
-If a C<store|Git::Database::Tutorial/store> attribute is provided,
-the C<backend> for it is automatically generated.
+Git::Database is actually a factory class: L</new> returns
+L<backend|Git::Database::Tutorial/backend> instances.
 
 =head1 METHODS
 
-All the backend methods are delegated to the L</backend> attribute.
+=head2 new
+
+    my $r = Git::Repository->new;
+
+    # $db is-a Git::Database::Backend::Git::Repository
+    my $db = Git::Database->new( store => $r );
+
+Return a L<backend|Git::Database::Tutorial/backend> object, based on
+the class of the L<store|Git::Database::Tutorial/store> object.
+
+=head1 BACKEND METHODS
 
 The backend methods are split between several roles, and not all backends
-do all the roles. Therefore not all backend objects support all these
-methods.
+do all the roles. Therefore not all backend objects support all the
+following methods.
 
 =head2 From L<Git::Database::Role::Backend>
 
@@ -108,13 +87,15 @@ always available.
 
 =over 4
 
+=item L<has_object|Git::Database::Role::ObjectReader/has_object>
+
 =item L<get_object_meta|Git::Database::Role::ObjectReader/get_object_meta>
 
 =item L<get_object_attributes|Git::Database::Role::ObjectReader/get_object_attributes>
 
 =item L<get_object|Git::Database::Role::ObjectReader/get_object>
 
-=item L<get_hashes|Git::Database::Role::ObjectReader/get_hashes>
+=item L<all_digests|Git::Database::Role::ObjectReader/all_digests>
 
 =back
 
@@ -130,9 +111,11 @@ always available.
 
 =over 4
 
-=item L<resolve_ref|Git::Database::Role::RefReader/resolve_ref>
+=item L<refs|Git::Database::Role::RefReader/refs>
 
-=item L<get_refs|Git::Database::Role::RefReader/get_refs>
+=item L<ref_names|Git::Database::Role::RefReader/ref_names>
+
+=item L<ref_digest|Git::Database::Role::RefReader/ref_digest>
 
 =back
 
@@ -148,15 +131,29 @@ always available.
 
 =head1 SEE ALSO
 
+=over 4
+
+=item Objects
+
 L<Git::Database::Object::Blob>,
 L<Git::Database::Object::Tree>,
 L<Git::Database::Object::Commit>,
-L<Git::Database::Object::Tag>,
+L<Git::Database::Object::Tag>.
+
+=item Backend roles
+
 L<Git::Database::Role::Backend>,
-L<Git::Database::Role::ObjectReader>.
-L<Git::Database::Role::ObjectWriter>.
-L<Git::Database::Role::RefReader>.
+L<Git::Database::Role::ObjectReader>,
+L<Git::Database::Role::ObjectWriter>,
+L<Git::Database::Role::RefReader>,
 L<Git::Database::Role::RefWriter>.
+
+=item Backends
+
+L<Git::Database::Backend::None>,
+L<Git::Database::Backend::Git::Repository>.
+
+=back
 
 =head1 SUPPORT
 
