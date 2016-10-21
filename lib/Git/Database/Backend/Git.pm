@@ -10,6 +10,7 @@ with
   'Git::Database::Role::Backend',
   'Git::Database::Role::ObjectReader',
   'Git::Database::Role::ObjectWriter',
+  'Git::Database::Role::RefReader',
   ;
 
 has '+store' => (
@@ -149,6 +150,15 @@ sub put_object {
     return $digest;
 }
 
+# Git::Database::Role::RefReader
+sub refs {
+    my ($self) = @_;
+    return {
+        reverse map +( split / / ),
+        $self->store->command(qw( show-ref --head ))
+    };
+}
+
 sub DEMOLISH {
     my ( $self, $in_global_destruction ) = @_;
     return if $in_global_destruction;    # why bother?
@@ -174,6 +184,7 @@ __END__
   get_object_meta
   all_digests
   put_object
+  refs
 
 =head1 NAME
 
@@ -198,7 +209,8 @@ This backend does the following roles
 (check their documentation for a list of supported methods):
 L<Git::Database::Role::Backend>,
 L<Git::Database::Role::ObjectReader>,
-L<Git::Database::Role::ObjectWriter>.
+L<Git::Database::Role::ObjectWriter>,
+L<Git::Database::Role::RefReader>.
 
 =head1 AUTHOR
 
