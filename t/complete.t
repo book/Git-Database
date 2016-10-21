@@ -14,7 +14,6 @@ my @roles = qw(
 
 my @todo = qw(
   Cogit-RefWriter
-  Git-RefWriter
   Git::PurePerl-RefWriter
 );
 
