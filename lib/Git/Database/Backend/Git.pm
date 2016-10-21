@@ -37,3 +37,45 @@ sub hash_object {
 }
 
 1;
+
+__END__
+
+=pod
+
+=head1 NAME
+
+Git::Database::Backend::Git - A Git::Database backend based on Git
+
+=head1 SYNOPSIS
+
+    # get a store
+    my $r  = Git->new();
+
+    # let Git::Database produce the backend
+    my $db = Git::Database->new( store => $r );
+
+=head1 DESCRIPTION
+
+This backend reads and write data from a Git repository using the
+L<Git> Git wrapper.
+
+=head2 Git Database Roles
+
+This backend does the following roles
+(check their documentation for a list of supported methods):
+L<Git::Database::Role::Backend>.
+
+=head1 AUTHOR
+
+Philippe Bruhat (BooK) <book@cpan.org>
+
+=head1 COPYRIGHT
+
+Copyright 2016 Philippe Bruhat (BooK), all rights reserved.
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut
