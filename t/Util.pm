@@ -71,6 +71,7 @@ sub empty_repository {
 my %builder_for = (
     'None' => sub { '' },    # ignored by Git::Database::Backend::None
     'Cogit' => sub { Cogit->new( directory => shift ); },
+    'Git'             => sub { Git->repository( Directory      => shift ); },
     'Git::PurePerl'   => sub { Git::PurePerl->new( directory   => shift ); },
     'Git::Repository' => sub { Git::Repository->new( work_tree => shift ); },
     'Git::Sub'        => sub { shift },
