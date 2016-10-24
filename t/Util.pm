@@ -35,7 +35,7 @@ sub objects_from {
             $object->{kind} = $kind;
             $object->{desc} ||= join ' ', $object->{kind}, $object->{digest};
             $object->{sha1} = $object->{digest};
-            $object->{size} = length $object->{content};
+            $object->{size} ||= length $object->{content};
             $object->{string} ||= $object->{content};
             $object->{commit_info}{parents_digest} ||= []
               if $kind eq 'commit';
