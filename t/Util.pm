@@ -27,7 +27,7 @@ sub objects_from {
 
     # TODO: looks in @INC, saves in %INC, is it really wanted?
     # we could just slurp and eval the content of the file.
-    my $objects = do $perl;
+    my $objects = do $perl or die $@;
 
     # add extra information
     for my $kind ( @kinds ) {
