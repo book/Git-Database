@@ -127,7 +127,7 @@ my %cmp_for = (
 
         # can't use is_deeply here
         my $commit_info = $commit->commit_info;
-        for my $attr (qw( tree_digest authored_time committed_time comment )) {
+        for my $attr (qw( tree_digest author_date committer_date comment encoding )) {
             is(
                 $commit_info->{$attr},
                 $test->{commit_info}{$attr},
@@ -152,7 +152,7 @@ my %cmp_for = (
 
         # can't use is_deeply here
         my $tag_info = $tag->tag_info;
-        for my $attr (qw( object type tag tagger_time comment )) {
+        for my $attr (qw( object type tag tagged_date comment )) {
             is( $tag_info->{$attr}, $test->{tag_info}{$attr},
                 "= tag_info.$attr" );
         }
