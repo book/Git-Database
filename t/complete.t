@@ -14,9 +14,6 @@ my @roles = qw(
 
 my @todo = qw(
   Git::PurePerl-RefWriter
-  Git::Wrapper-ObjectWriter
-  Git::Wrapper-RefReader
-  Git::Wrapper-RefWriter
 );
 
 for my $backend ( available_backends() ) {
