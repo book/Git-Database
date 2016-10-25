@@ -1,5 +1,7 @@
 package Git::Database::Role::Backend;
 
+use Digest::SHA;
+
 use Git::Database::Object::Blob;
 use Git::Database::Object::Tree;
 use Git::Database::Object::Commit;
