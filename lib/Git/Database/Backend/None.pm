@@ -1,7 +1,5 @@
 package Git::Database::Backend::None;
 
-use Digest::SHA;
-
 use Moo;
 use namespace::clean;
 
