@@ -108,7 +108,10 @@ The L<Git::Repository::Tutorial> documentation has detailed examples
 of how to L<create|Git::Repository::Tutorial/"Create a new repository">
 or L<clone|Git::Repository::Tutorial/"Clone a repository"> a new repository.
 
-The resulting object can then be passed to C<< Git::Database->new >>.
+Other Git wrappers may also be able to create new repositories.
+
+The resulting object can then be passed to C<< Git::Database->new >>
+as the C<store> attribute.
 
 =head2 Create a Git object
 
