@@ -2,6 +2,9 @@ Revision history for Git-Database
 
 {{$NEXT}}
 
+0.004 2016-10-29 BOOK
+    - New backend: Git
+
 0.003 2016-10-20 BOOK
     - New backend: Git::PurePerl
     - New backend: Cogit
