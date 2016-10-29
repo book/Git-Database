@@ -2,7 +2,9 @@ use strict;
 use warnings;
 use Test::More;
 use Module::Runtime qw( use_module );
-use t::Util;
+
+use lib 't';
+use Util;
 
 my @roles = qw(
   Backend

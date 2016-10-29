@@ -2,9 +2,11 @@ use strict;
 use warnings;
 use Test::More;
 use Module::Runtime qw( require_module );
-use t::Util;
 
 use Git::Database;
+
+use lib 't';
+use Util;
 
 plan skip_all => 'Git::Sub not available'
   if !eval { require Git::Sub; };

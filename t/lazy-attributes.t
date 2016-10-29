@@ -3,7 +3,8 @@ use warnings;
 use Test::More;
 use Git::Database;
 
-use t::Util;
+use lib 't';
+use Util;
 
 # this set of tests mostly targets the builders:
 #
