@@ -165,6 +165,10 @@ L<Git::Database::Role::RefWriter>.
 
 Philippe Bruhat (BooK) <book@cpan.org>
 
+Sergey Romanov provided the code to support the
+L<Git::Database::Role::ObjectWriter>, L<Git::Database::Role::RefReader>,
+and L<Git::Database::Role::RefWriter> roles.
+
 =head1 COPYRIGHT
 
 Copyright 2016 Philippe Bruhat (BooK), all rights reserved.
