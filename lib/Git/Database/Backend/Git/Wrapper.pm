@@ -50,7 +50,6 @@ sub get_object_meta {
 sub get_object_attributes {
     my ( $self, $digest ) = @_;
 
-    # I don't see how this can't break on binary data
     my @out = $self->store->cat_file( { -STDIN => "$digest\n" }, '--batch' );
     my $meta = shift @out;
     warn join $/, @{ $self->store->ERR }, '' if @{ $self->store->ERR };
@@ -62,10 +61,10 @@ sub get_object_attributes {
     return undef if $parts[-1] eq 'missing';
 
     return {
-        kind       => $kind,
-        size       => $size,
-        content    => join( $/, @out ),
-        digest     => $sha1
+        kind    => $kind,
+        size    => $size,
+        content => join( $/, @out ),    # I expect this to break on binary data
+        digest  => $sha1
     };
 }
 
