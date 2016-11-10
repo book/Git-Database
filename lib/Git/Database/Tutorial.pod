@@ -48,11 +48,11 @@ The backend class is named after the store class. For example,
 the backend class for L<Git::Repository> stores is named
 L<Git::Database::Backend::Git::Repository>.
 
-The currently supported stores are:
-L<Git::Repository>, L<Git::Sub>, L<Git::PurePerl>, L<Cogit>,
-and L<Git>.
-Several branches exist in the development repository to add support for
-other Git wrappers. Patches welcome!
+The currently supported stores are (by order of appearance):
+L<Git::Repository>, L<Git::Sub>, L<Git::PurePerl>, L<Cogit>, L<Git>,
+and L<Git::Wrapper>.
+If you know of other Git wrappers, please let me know or submit patches.
+Thanks!
 
 =item object
 
