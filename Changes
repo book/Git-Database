@@ -2,6 +2,9 @@ Revision history for Git-Database
 
 {{$NEXT}}
 
+0.005 2016-11-13 BOOK
+    - New backend: Git::Wrapper (with help from SROMANOV)
+
 0.004 2016-10-29 BOOK
     - New backend: Git
 
