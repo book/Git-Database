@@ -123,20 +123,25 @@ L<Git::Database::Role::Object> role), with subtle differences between them.
 =item using the class directly
 
     my $blob = Git::Database::Object::Blob->new( content => "Hello, world!" );
-
-    $blob->isa('Git::Database::Object::Blob');    # true
+    $blob->isa("Git::Database::Object::Blob");    # true
     $blob->has_backend;                           # false
-    $blob->digest;    # use hash_object() from Git::Database::Role::Backend
+    $blob->digest;    # use hash_object() from Git::Database::Backend::None
+    $blob->has_backend;                           # true
+    $blob->backend->isa("Git::Database::Backend::None");
 
 =item using the backend
 
     my $blob = $backend->create_object( content => "Hello, world!" );
-
-    $blob->isa('Git::Database::Object::Blob');    # true
+    $blob->isa("Git::Database::Object::Blob");    # true
     $blob->has_backend;                           # true
-    $blob->digest;    # use hash_object from $backend (might be faster)
+    $blob->digest;    # use hash_object() from $backend (might be faster)
+    $blob->backend->isa( ref $backend );
 
 =back
+
+When no backend is provided, a default L<Git::Database::Backend::None> is
+created as needed. Its L<hash_object|Git::Database::Role::Backend/hash_object>
+method is the default implementation provided by L<Git::Database::Role::Backend>.
 
 =head1 AUTHOR
 
