@@ -80,14 +80,11 @@ sub all_digests {
           $store->cat_file(qw( --batch-check --batch-all-objects ));
     }
     else {    # this won't return unreachable objects
-        my $batch = $store->command(qw( cat-file --batch-check ));
-        my ( $stdin, $stdout ) = ( $batch->stdin, $batch->stdout );
-        my @digests =
-          map +( split / / )[0], grep /$re/,
-          map { print {$stdin} ( split / / )[0], "\n"; $stdout->getline }
+        my $revs = join "\n", map +( split / / )[0],
           sort $store->rev_list(qw( --all --objects ));
-        $batch->close;
-        return @digests;
+        return if !length $revs;
+        return map +( split / / )[0], grep /$re/,
+          $store->cat_file( qw( --batch-check ), { -STDIN => "$revs\n" } );
     }
 }
 
