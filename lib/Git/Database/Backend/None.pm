@@ -39,16 +39,18 @@ Git::Database::Backend::None - A minimal backend for Git::Database
 C<Git::Database::Backend::None> is the minimal backend class for
 L<Git::Database>.
 
-I can't read or write from a L<store|Git::Database::Tutorial/store>,
+It can't read or write from a L<store|Git::Database::Tutorial/store>,
 because it doesn't have one.
 
-=head1 METHODS
+=head2 Git Database Roles
 
-=head2 hash_object
+This backend does the following roles
+(check their documentation for a list of supported methods):
+L<Git::Database::Role::Backend>.
 
 Since it's not connected to a store, this class can't delegate the
-L<digest|Git::Database::Role::Object/digest> computation to Git itself. It
-therefore uses the default implementation provided by
+L<digest|Git::Database::Role::Object/digest> computation to Git
+itself. It therefore uses the default implementation provided by
 L<Git::Database::Role::Backend>.
 
 =head1 AUTHOR
