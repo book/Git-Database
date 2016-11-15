@@ -1,5 +1,8 @@
 package Git::Database;
 
+use strict;
+use warnings;
+
 use Module::Runtime qw( use_module );
 
 use Moo::Object ();
