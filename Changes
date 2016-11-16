@@ -2,6 +2,11 @@ Revision history for Git-Database
 
 {{$NEXT}}
 
+0.006 2016-11-16 BOOK
+    - Fix the Git::Wrapper backend's all_digests() method for older Git versions
+      (RT #118732, reported by SREZIC)
+    - Documentation updates
+
 0.005 2016-11-13 BOOK
     - New backend: Git::Wrapper (with help from SROMANOV)
 
