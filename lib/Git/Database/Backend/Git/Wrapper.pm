@@ -57,6 +57,9 @@ sub get_object_attributes {
     # protect against weird cases like if $digest contains a space
     my ( $sha1, $kind, $size ) = my @parts = split / /, $meta;
 
+    # git versions >= 2.11.0.rc0 throw more verbose errors
+    return undef if $parts[0] =~ /^(?:symlink|dangling|loop|notdir)$/;
+
     # object does not exist in the git object database
     return undef if $parts[-1] eq 'missing';
 

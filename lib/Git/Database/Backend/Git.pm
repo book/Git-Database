@@ -85,6 +85,12 @@ sub get_object_attributes {
     # protect against weird cases like if $sha1 contains a space
     my ( $sha1, $kind, $size ) = my @parts = split / /, $reply;
 
+    # git versions >= 2.11.0.rc0 throw more verbose errors
+    if ( $parts[0] =~ /^(?:symlink|dangling|loop|notdir)$/ ) {
+        <$out>;    # eat the next line
+        return undef;
+    }
+
     # object does not exist in the git object database
     return undef if $parts[-1] eq 'missing';
 
