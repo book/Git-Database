@@ -2,6 +2,10 @@ Revision history for Git-Database
 
 {{$NEXT}}
 
+0.007 2017-01-29 BOOK
+    - Adapt get_object_attributes to `git cat-file` output after format change
+      (RT #119915, reported by SREZIC)
+
 0.006 2016-11-16 BOOK
     - Fix the Git::Wrapper backend's all_digests() method for older Git versions
       (RT #118732, reported by SREZIC)
