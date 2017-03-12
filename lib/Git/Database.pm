@@ -154,7 +154,12 @@ L<Git::Database::Role::RefWriter>.
 =item Backends
 
 L<Git::Database::Backend::None>,
-L<Git::Database::Backend::Git::Repository>.
+L<Git::Database::Backend::Git::Repository>,
+L<Git::Database::Backend::Git::Sub>,
+L<Git::Database::Backend::Git::PurePerl>,
+L<Git::Database::Backend::Cogit>,
+L<Git::Database::Backend::Git>,
+L<Git::Database::Backend::Git::Wrapper>.
 
 =back
 
