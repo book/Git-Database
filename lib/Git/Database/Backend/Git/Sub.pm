@@ -82,7 +82,6 @@ sub get_object_attributes {
 sub all_digests {
     my ( $self, $kind ) = @_;
 
-    local $_;    # Git::Sub seems to clobber $_ in list context
     my $re = $kind ? qr/ \Q$kind\E / : qr/ /;
     my @digests;
 
@@ -120,7 +119,6 @@ sub put_object {
 sub refs {
     my ($self) = @_;
     my $keeper = pushd $self->store;
-    local $_;    # Git::Sub seems to clobber $_ in list context
     my %digest = reverse map +( split / / ),
       git::show_ref '--head';
     return \%digest;
@@ -186,6 +184,12 @@ L<Git::Database::Role::ObjectReader>,
 L<Git::Database::Role::ObjectWriter>,
 L<Git::Database::Role::RefReader>,
 L<Git::Database::Role::RefWriter>.
+
+=head1 CAVEAT
+
+This backend may have issues with Perl 5.8.9, they are fixed in L<Git::Sub> 0.163320.
+
+There is also a minimum requirement on L<System::Sub> 0.162800.
 
 =head1 AUTHOR
 
