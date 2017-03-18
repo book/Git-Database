@@ -98,7 +98,8 @@ returns the full object extracted from the Git database (one of
 L<Git::Database::Object::Blob>, L<Git::Database::Object::Tree>,
 L<Git::Database::Object::Commit>, or L<Git::Database::Object::Tag>).
 
-Returns C<undef> if the object is not in the Git database.
+Returns C<undef> if the object is not in the Git database or if the
+abbreviated digest is ambiguous.
 
 =head2 get_object_meta
 
