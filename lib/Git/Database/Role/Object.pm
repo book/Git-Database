@@ -35,9 +35,10 @@ has size => (
 );
 
 has content => (
-    is        => 'lazy',
+    is        => 'rwp',
     builder   => sub { $_[0]->_get_object_attributes->{content} },
     predicate => 1,
+    lazy      => 1,
 );
 
 sub as_string { $_[0]->content; }
