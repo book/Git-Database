@@ -154,7 +154,12 @@ L<Git::Database::Role::RefWriter>.
 =item Backends
 
 L<Git::Database::Backend::None>,
-L<Git::Database::Backend::Git::Repository>.
+L<Git::Database::Backend::Git::Repository>,
+L<Git::Database::Backend::Git::Sub>,
+L<Git::Database::Backend::Git::PurePerl>,
+L<Git::Database::Backend::Cogit>,
+L<Git::Database::Backend::Git>,
+L<Git::Database::Backend::Git::Wrapper>.
 
 =back
 
@@ -192,7 +197,7 @@ Philippe Bruhat (BooK) <book@cpan.org>.
 
 =head1 COPYRIGHT
 
-Copyright 2013-2016 Philippe Bruhat (BooK), all rights reserved.
+Copyright 2013-2017 Philippe Bruhat (BooK), all rights reserved.
 
 =head1 LICENSE
 

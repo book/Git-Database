@@ -33,16 +33,42 @@ sub BUILD {
     ) if $self->has_directory_entries;
 }
 
-# assumes directory_entries is set
 sub _build_content {
-    return $_[0]->has_directory_entries
-      ? join '', map $_->as_content, @{ $_[0]->directory_entries }
-      : Git::Database::Role::Object::_build_content( $_[0] );
+    my ($self) = @_;
+
+    if ( !$self->has_directory_entries ) {
+        my $attr = $self->_get_object_attributes();
+        return $attr->{content} if exists $attr->{content};
+
+        if ( exists $attr->{directory_entries} ) {
+            $self->_set_directory_entries( $attr->{directory_entries} );
+        }
+        else {
+            die "Can't build content from these attributes: "
+              . join( ', ', sort keys %$attr );
+        }
+    }
+
+    return join '', map $_->as_content, @{ $self->directory_entries };
 }
 
 # assumes content is set
 sub _build_directory_entries {
-    my $self    = shift;
+    my ($self) = @_;
+
+    if ( !$self->has_content ) {
+        my $attr = $self->_get_object_attributes();
+        return $attr->{directory_entries} if exists $attr->{directory_entries};
+
+        if ( exists $attr->{content} ) {
+            $self->_set_content( $attr->{content} );
+        }
+        else {
+            die "Can't build content from these attributes: "
+              . join( ', ', sort keys %$attr );
+        }
+    }
+
     my $content = $self->content;
     return [] unless $content;
 
