@@ -139,7 +139,33 @@ all the attributes needed to create a new object (if the requested object
 is in the database). This method is typically used by L</get_object>
 to create the actual object instance.
 
-Otherwise return the C<undef> value.
+Return C<undef> if the object is not in the Git database or if the
+abbreviated digest is ambiguous.
+
+The exact content of the hash reference returned by C<get_object_attributes>
+may vary, but there are certain minimum requirements:
+
+=over 4
+
+=item *
+
+The C<kind> key is B<required>.
+
+=item *
+
+If present, the C<digest> value B<must> be the full digest (40 hexadecimal
+digits).
+
+=item *
+
+Although most backends return the C<content> attribute, it is not strictly
+required (except for a blob). For a tree, a backend can instead return
+the L<directory_entries|Git::Database::Object::Tree/directory_entries>
+attribute (a list of L<Git::Database::DirectoryEntry> objects). Likewise,
+it can also provide L<commit_info|Git::Database::Object::Commit/commit_info>
+for a commit and L<tag_info|Git::Database::Object::Tag/tag_info> for a tag.
+
+=back
 
 =head2 all_digests
 
