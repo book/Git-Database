@@ -236,8 +236,9 @@ One (and only one) of the C<content> or C<commit_info> arguments is
 required.
 
 C<commit_info> is a reference to a hash containing the keys listed
-above, i.e. C<tree_digest>, C<author>, C<author_date>, C<committer>,
-C<committed_date>, C<comment>, and C<encoding> (optional).
+above, i.e. C<tree_digest>, C<parents_digest> (optional), C<author>,
+C<author_date>, C<committer>, C<committer_date>, C<comment>, and
+C<encoding> (optional).
 
 =head1 SEE ALSO
 
