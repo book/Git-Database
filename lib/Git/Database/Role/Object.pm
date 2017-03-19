@@ -35,17 +35,24 @@ has size => (
 );
 
 has content => (
-    is      => 'lazy',
-    builder => sub {
-        my ( $digest, $backend ) = ( $_[0]->digest, $_[0]->backend );
-        my $attr = $backend->get_object_attributes($digest);
-        die $_[0]->kind . " $digest not found in $backend" if !$attr;
-        return $attr->{content};
-    },
+    is        => 'lazy',
+    builder   => sub { $_[0]->_get_object_attributes->{content} },
     predicate => 1,
 );
 
 sub as_string { $_[0]->content; }
+
+sub _get_object_attributes {
+    my ($self) = @_;
+    my $backend = $self->backend;
+    die sprintf "%s can't get_object_attributes", $backend
+      if !$backend->can('get_object_attributes');
+
+    my $attr = $backend->get_object_attributes( $self->digest );
+    die sprintf '%s %s not found in %s', $self->kind, $self->digest, $backend
+      if !$attr;
+    return $attr;
+}
 
 1;
 
