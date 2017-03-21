@@ -19,6 +19,15 @@ has '+store' => (
     } ),
 );
 
+my %type = (
+    blob   => Git::Raw::Object->BLOB,
+    tree   => Git::Raw::Object->TREE,
+    commit => Git::Raw::Object->COMMIT,
+    tag    => Git::Raw::Object->TAG,
+);
+my @kind;
+$kind[ $type{$_} ] = $_ for keys %type;
+
 # Git::Database::Role::ObjectReader
 sub get_object_attributes {
     my ( $self, $digest ) = @_;
@@ -26,106 +35,20 @@ sub get_object_attributes {
       or $@ and do { ( my $at = $@ ) =~ s/ at .* line .*$//; warn "$at\n" };
     return undef if !defined $object;
 
-    my $raw  = $self->store->odb->read( $object->id );
-
-    require DateTime;
-    require Git::Database::Actor;
-    require Git::Database::DirectoryEntry;
-
-    my $kind = lc +( split /::/, ref $object )[-1];
-    if ( $kind eq 'tree' ) {
-        return {
-            kind              => $kind,
-            digest            => $object->id,
-            size              => $raw->size,
-            directory_entries => [
-                map Git::Database::DirectoryEntry->new(
-                    mode     => sprintf( '%o', $_->file_mode ),
-                    filename => $_->name,
-                    digest   => $_->id,
-                ),
-                $object->entries
-            ],
-        };
-    }
-    elsif ( $kind eq 'blob' ) {
-        return {
-            kind    => $kind,
-            size    => $object->size,
-            content => $object->content,
-            digest  => $object->id,
-        };
-    }
-    elsif ( $kind eq 'commit' ) {
-        return {
-            kind        => $kind,
-            digest      => $object->id,
-            size        => $raw->size,
-            commit_info => {
-                tree_digest    => $object->tree->id,
-                parents_digest => [ map $_->id, $object->parents ],
-                author         => Git::Database::Actor->new(
-                    name  => $object->author->name,
-                    email => $object->author->email,
-                ),
-                author_date => DateTime->from_epoch(
-                    epoch     => $object->author->time,
-                    time_zone => DateTime::TimeZone->offset_as_string(
-                        $object->author->offset * 60
-                    ),
-                ),
-                committer => Git::Database::Actor->new(
-                    name  => $object->committer->name,
-                    email => $object->committer->email,
-                ),
-                committer_date => DateTime->from_epoch(
-                    epoch     => $object->committer->time,
-                    time_zone => DateTime::TimeZone->offset_as_string(
-                        $object->committer->offset * 60
-                    ),
-                ),
-                comment => map( { chomp; $_ } $object->message ),
-                encoding => 'utf-8',
-            },
-        };
-    }
-    elsif ( $kind eq 'tag' ) {
-        return {
-            kind     => $kind,
-            digest   => $object->id,
-            size     => $raw->size,
-            tag_info => {
-                object => $object->target->id,
-                type   => lc +( split /::/, ref $object->target )[-1],
-                tag    => $object->name,
-                tagger => Git::Database::Actor->new(
-                    name  => $object->tagger->name,
-                    email => $object->tagger->email,
-                ),
-                tagger_date => DateTime->from_epoch(
-                    epoch     => $object->tagger->time,
-                    time_zone => DateTime::TimeZone->offset_as_string(
-                        $object->tagger->offset * 60
-                    ),
-                ),
-                comment => map( { chomp; $_ } $object->message ),
-            }
-        };
-    }
-    else { die "Unknown object kind: $kind" }
+    # get the Git::Raw::Odb::Object
+    $object = $self->store->odb->read( $object->id );
+    return {
+        kind    => $kind[ $object->type ],
+        size    => $object->size,
+        content => $object->data,
+        digest  => $object->id,
+    };
 }
 
 sub all_digests {
     my ( $self, $kind ) = @_;
     my $odb = $self->store->odb;
-    my $type = $kind
-      ? {
-        blob   => Git::Raw::Object->BLOB,
-        tree   => Git::Raw::Object->TREE,
-        commit => Git::Raw::Object->COMMIT,
-        tag    => Git::Raw::Object->TAG,
-      }->{$kind}
-      : '';
+    my $type = $kind ? $type{$kind} : '';
 
     my @digests;
     $odb->foreach(
