@@ -7,6 +7,7 @@ use namespace::clean;
 
 with
   'Git::Database::Role::Backend',
+  'Git::Database::Role::ObjectReader',
   'Git::Database::Role::RefReader',
   'Git::Database::Role::RefWriter',
   ;
@@ -25,6 +26,8 @@ sub get_object_attributes {
       or $@ and do { ( my $at = $@ ) =~ s/ at .* line .*$//; warn "$at\n" };
     return undef if !defined $object;
 
+    my $raw  = $self->store->odb->read( $object->id );
+
     require DateTime;
     require Git::Database::Actor;
     require Git::Database::DirectoryEntry;
@@ -34,6 +37,7 @@ sub get_object_attributes {
         return {
             kind              => $kind,
             digest            => $object->id,
+            size              => $raw->size,
             directory_entries => [
                 map Git::Database::DirectoryEntry->new(
                     mode     => sprintf( '%o', $_->file_mode ),
@@ -56,6 +60,7 @@ sub get_object_attributes {
         return {
             kind        => $kind,
             digest      => $object->id,
+            size        => $raw->size,
             commit_info => {
                 tree_digest    => $object->tree->id,
                 parents_digest => [ map $_->id, $object->parents ],
@@ -88,6 +93,7 @@ sub get_object_attributes {
         return {
             kind     => $kind,
             digest   => $object->id,
+            size     => $raw->size,
             tag_info => {
                 object => $object->target->id,
                 type   => lc +( split /::/, ref $object->target )[-1],

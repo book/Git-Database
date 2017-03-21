@@ -153,6 +153,12 @@ The C<kind> key is B<required>.
 
 =item *
 
+The C<size> key is B<required>, if the backend does not provide its own
+L</get_object_meta> implementation (as the default implementation depends
+on L</get_object_attributes> to obtain the metadata).
+
+=item *
+
 If present, the C<digest> value B<must> be the full digest (40 hexadecimal
 digits).
 
