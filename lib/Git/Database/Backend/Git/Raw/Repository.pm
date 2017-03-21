@@ -109,6 +109,31 @@ sub get_object_attributes {
     else { die "Unknown object kind: $kind" }
 }
 
+sub all_digests {
+    my ( $self, $kind ) = @_;
+    my $odb = $self->store->odb;
+    my $type = $kind
+      ? {
+        blob   => Git::Raw::Object->BLOB,
+        tree   => Git::Raw::Object->TREE,
+        commit => Git::Raw::Object->COMMIT,
+        tag    => Git::Raw::Object->TAG,
+      }->{$kind}
+      : '';
+
+    my @digests;
+    $odb->foreach(
+        $kind
+        ? sub {
+            my $o = $odb->read( shift );
+            push @digests, $o->id if $o->type == $type;
+            return 0;
+          }
+        : sub { push @digests, shift; return 0; }
+    );
+    return sort @digests;
+}
+
 # Git::Database::Role::RefReader
 sub refs {
     my ($self) = @_;
