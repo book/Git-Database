@@ -131,7 +131,7 @@ L<Git::Database::Role::Object> role), with subtle differences between them.
 
 =item using the backend
 
-    my $blob = $backend->create_object( content => "Hello, world!" );
+    my $blob = $backend->create_object( kind => 'blob',  content => "Hello, world!" );
     $blob->isa("Git::Database::Object::Blob");    # true
     $blob->has_backend;                           # true
     $blob->digest;    # use hash_object() from $backend (might be faster)
