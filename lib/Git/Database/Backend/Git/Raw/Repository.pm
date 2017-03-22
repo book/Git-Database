@@ -31,12 +31,12 @@ $kind[ $type{$_} ] = $_ for keys %type;
 # Git::Database::Role::ObjectReader
 sub get_object_attributes {
     my ( $self, $digest ) = @_;
-    my $object = eval { $self->store->lookup($digest) }
+
+    # get the Git::Raw::Odb::Object
+    my $object = eval { $self->store->odb->read($digest) }
       or $@ and do { ( my $at = $@ ) =~ s/ at .* line .*$//; warn "$at\n" };
     return undef if !defined $object;
 
-    # get the Git::Raw::Odb::Object
-    $object = $self->store->odb->read( $object->id );
     return {
         kind    => $kind[ $object->type ],
         size    => $object->size,
