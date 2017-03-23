@@ -132,9 +132,18 @@ L<Git::Database::Role::ObjectReader>,
 L<Git::Database::Role::RefReader>.
 L<Git::Database::Role::RefWriter>.
 
-=head1 AUTHOR
+=head1 AUTHORS
 
-Sergey Romanov <sromanov@cpan.org>
+Sergey Romanov provided the initial version of the module,
+with support for the L<Git::Database::Role::RefReader> and
+L<Git::Database::Role::RefWriter> roles.
+
+Philippe Bruhat (BooK) <book@cpan.org> implemented
+the L<Git::Database::Role::ObjectReader> and
+L<Git::Database::Role::ObjectWriter> roles.
+
+Jacques Germishuys added the features needed for the above roles to
+L<Git::Raw>.
 
 =head1 COPYRIGHT
 
