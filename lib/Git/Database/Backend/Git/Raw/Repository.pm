@@ -128,6 +128,7 @@ bindings to the L<libgit2|http://libgit2.github.com> library.
 This backend does the following roles
 (check their documentation for a list of supported methods):
 L<Git::Database::Role::Backend>,
+L<Git::Database::Role::ObjectReader>,
 L<Git::Database::Role::RefReader>.
 L<Git::Database::Role::RefWriter>.
 
