@@ -99,10 +99,12 @@ __END__
 =pod
 
 =for Pod::Coverage
+  get_object_attributes
+  all_digests
   refs
-  _deref
   put_ref
   delete_ref
+  _deref
 
 =head1 NAME
 
