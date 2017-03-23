@@ -8,6 +8,7 @@ use namespace::clean;
 with
   'Git::Database::Role::Backend',
   'Git::Database::Role::ObjectReader',
+  'Git::Database::Role::ObjectWriter',
   'Git::Database::Role::RefReader',
   'Git::Database::Role::RefWriter',
   ;
@@ -27,6 +28,12 @@ my %type = (
 );
 my @kind;
 $kind[ $type{$_} ] = $_ for keys %type;
+
+# Git::Database::Role::Backend
+sub hash_object {
+    my ( $self, $object ) = @_;
+    return $self->store->odb->hash( $object->content, $type{ $object->kind } );
+}
 
 # Git::Database::Role::ObjectReader
 sub get_object_attributes {
@@ -61,6 +68,12 @@ sub all_digests {
         : sub { push @digests, shift; return 0; }
     );
     return sort @digests;
+}
+
+# Git::Database::Role::ObjectWriter
+sub put_object {
+    my ( $self, $object ) = @_;
+    return $self->store->odb->write( $object->content, $type{ $object->kind } );
 }
 
 # Git::Database::Role::RefReader
@@ -129,6 +142,7 @@ This backend does the following roles
 (check their documentation for a list of supported methods):
 L<Git::Database::Role::Backend>,
 L<Git::Database::Role::ObjectReader>,
+L<Git::Database::Role::ObjectWriter>,
 L<Git::Database::Role::RefReader>.
 L<Git::Database::Role::RefWriter>.
 
