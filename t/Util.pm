@@ -76,6 +76,7 @@ my %builder_for = (
     'Git::Repository' => sub { Git::Repository->new( work_tree => shift ); },
     'Git::Sub'        => sub { shift },
     'Git::Wrapper'    => sub { Git::Wrapper->new( shift ); },
+    'Git::Raw::Repository' => sub { Git::Raw::Repository->open( shift ); },
 );
 
 sub store_for { return $builder_for{ $_[0] }->( $_[1] ); }

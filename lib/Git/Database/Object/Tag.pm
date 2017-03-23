@@ -12,9 +12,11 @@ with 'Git::Database::Role::Object';
 sub kind {'tag'}
 
 has tag_info => (
-    is        => 'lazy',
+    is        => 'rwp',
     required  => 0,
     predicate => 1,
+    lazy      => 1,
+    builder   => 1,
 );
 
 sub BUILD {
@@ -39,7 +41,21 @@ for my $attr (
 }
 
 sub _build_tag_info {
-    my $self     = shift;
+    my ($self) = @_;
+
+    if ( !$self->has_content ) {
+        my $attr = $self->_get_object_attributes();
+        return $attr->{tag_info} if exists $attr->{tag_info};
+
+        if ( exists $attr->{content} ) {
+            $self->_set_content( $attr->{content} );
+        }
+        else {
+            die "Can't build content from these attributes: "
+              . join( ', ', sort keys %$attr );
+        }
+    }
+
     my $tag_info = {};
     my @lines    = split "\n", $self->content;
     while ( my $line = shift @lines ) {
@@ -68,8 +84,18 @@ sub _build_tag_info {
 sub _build_content {
     my ($self) = @_;
 
-    return Git::Database::Role::Object::_build_content($self)
-      if !$self->has_tag_info;
+    if ( ! $self->has_tag_info ) {
+        my $attr = $self->_get_object_attributes();
+        return $attr->{content} if exists $attr->{content};
+
+        if ( exists $attr->{tag_info} ) {
+            $self->_set_tag_info( $attr->{tag_info} );
+        }
+        else {
+            die "Can't build content from these attributes: "
+              . join( ', ', sort keys %$attr );
+        }
+    }
 
     my $content;
     $content .= "$_ " . $self->$_ . "\n" for qw( object type tag );

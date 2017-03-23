@@ -113,7 +113,7 @@ want to override it for performance reasons.
     my $object = $store->create_object( %attr );
 
 Return an object instance of an object doing the
-L<Git::Database::Role::Object> role, or C<undef> if C<kind> is unknown
+L<Git::Database::Role::Object> role, or dies if C<kind> is unknown
 or not provided.
 
 This method assumes the provided attribute values are consistent for the

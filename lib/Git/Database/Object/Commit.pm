@@ -12,9 +12,11 @@ with 'Git::Database::Role::Object';
 sub kind {'commit'}
 
 has commit_info => (
-    is        => 'lazy',
+    is        => 'rwp',
     required  => 0,
     predicate => 1,
+    lazy      => 1,
+    builder   => 1,
 );
 
 sub BUILD {
@@ -41,14 +43,23 @@ for my $attr (
 
 sub parents_digest { @{ $_[0]->commit_info->{parents_digest} ||= [] }; }
 
-# assumes commit_info is set
 sub _build_content {
     my ($self) = @_;
 
-    return Git::Database::Role::Object::_build_content($self)
-      if !$self->has_commit_info;
+    if ( !$self->has_commit_info ) {
+        my $attr = $self->_get_object_attributes();
+        return $attr->{content} if exists $attr->{content};
 
-    my $content .= 'tree ' . $self->tree_digest . "\n";
+        if ( exists $attr->{commit_info} ) {
+            $self->_set_commit_info( $attr->{commit_info} );
+        }
+        else {
+            die "Can't build content from these attributes: "
+              . join( ', ', sort keys %$attr );
+        }
+    }
+
+    my $content  = 'tree ' . $self->tree_digest . "\n";
     $content .= "parent $_\n" for $self->parents_digest;
     $content .= join(
         ' ',
@@ -70,9 +81,22 @@ sub _build_content {
     return $content;
 }
 
-# assumes content is set
 sub _build_commit_info {
-    my $self = shift;
+    my ($self) = @_;
+
+    if ( !$self->has_content ) {
+        my $attr = $self->_get_object_attributes();
+        return $attr->{commit_info} if exists $attr->{commit_info};
+
+        if ( exists $attr->{content} ) {
+            $self->_set_content( $attr->{content} );
+        }
+        else {
+            die "Can't build content from these attributes: "
+              . join( ', ', sort keys %$attr );
+        }
+    }
+
     my @lines = split "\n", $self->content;
 
     # parse the headers
