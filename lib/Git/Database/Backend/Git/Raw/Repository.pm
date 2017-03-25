@@ -112,8 +112,10 @@ __END__
 =pod
 
 =for Pod::Coverage
+  hash_object
   get_object_attributes
   all_digests
+  put_object
   refs
   put_ref
   delete_ref
