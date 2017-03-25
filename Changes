@@ -2,6 +2,12 @@ Revision history for Git-Database
 
 {{$NEXT}}
 
+0.008 2017-03-25 BOOK
+    - New backend: Git::Raw::Repository (with help from SROMANOV and JACQUESG)
+    - Make get_object_attributes accept any valid attributes combination
+      (i.e. not just content)
+    - Ensure the test suite works as expected when @INC does not contain '.'
+
 0.007 2017-01-29 BOOK
     - Adapt get_object_attributes to `git cat-file` output after format change
       (RT #119915, reported by SREZIC)
