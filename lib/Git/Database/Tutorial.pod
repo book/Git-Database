@@ -50,7 +50,7 @@ L<Git::Database::Backend::Git::Repository>.
 
 The currently supported stores are (by order of appearance):
 L<Git::Repository>, L<Git::Sub>, L<Git::PurePerl>, L<Cogit>, L<Git>,
-and L<Git::Wrapper>.
+L<Git::Wrapper>, and L<Git::Raw>.
 If you know of other Git wrappers, please let me know or submit patches.
 Thanks!
 

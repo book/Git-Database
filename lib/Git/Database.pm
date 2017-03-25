@@ -159,7 +159,8 @@ L<Git::Database::Backend::Git::Sub>,
 L<Git::Database::Backend::Git::PurePerl>,
 L<Git::Database::Backend::Cogit>,
 L<Git::Database::Backend::Git>,
-L<Git::Database::Backend::Git::Wrapper>.
+L<Git::Database::Backend::Git::Wrapper>,
+L<Git::Database::Backend::Git::Raw>.
 
 =back
 
