@@ -148,6 +148,10 @@ L<Git::Database::Role::ObjectWriter>,
 L<Git::Database::Role::RefReader>,
 L<Git::Database::Role::RefWriter>.
 
+=head1 CAVEAT
+
+This backend requires L<Git::Raw> version 0.74 or greater.
+
 =head1 AUTHORS
 
 Sergey Romanov <sromanov@cpan.org> provided the initial version of
