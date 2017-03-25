@@ -3,10 +3,10 @@ use warnings;
 use Test::More;
 use Git::Database;
 
-use lib 't';
-use Util;
+use lib 't/lib';
+use TestUtil;
 
-our @kinds;    # set by t::Util
+our @kinds;    # set by TestUtil
 
 # different object kinds work with different possible arguments
 my %args_for = (

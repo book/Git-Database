@@ -5,8 +5,8 @@ use Module::Runtime qw( require_module );
 
 use Git::Database;
 
-use lib 't';
-use Util;
+use lib 't/lib';
+use TestUtil;
 
 plan skip_all => 'Git::Sub not available'
   if !eval { require Git::Sub; };

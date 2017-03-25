@@ -3,8 +3,8 @@ use warnings;
 use Test::More;
 use Module::Runtime qw( use_module );
 
-use lib 't';
-use Util;
+use lib 't/lib';
+use TestUtil;
 
 my @roles = qw(
   Backend

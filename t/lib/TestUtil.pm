@@ -23,11 +23,11 @@ our @kinds = qw( blob tree commit tag );
 # test data
 sub objects_from {
     my ($name) = @_;
-    my $perl = File::Spec->catfile( 'bundles', "$name.perl" );
+    my $perl = File::Spec->catfile( 't', 'bundles', "$name.perl" );
 
-    # TODO: looks in @INC, saves in %INC, is it really wanted?
-    # we could just slurp and eval the content of the file.
-    my $objects = do $perl or die $@;
+    # slurp and eval the content of the file
+    my $objects = do { local @ARGV = ($perl); local $/; eval <> }
+      or die "Failed processing $perl";
 
     # add extra information
     for my $kind ( @kinds ) {

@@ -3,8 +3,8 @@ use warnings;
 use Test::More;
 use Git::Database;
 
-use lib 't';
-use Util;
+use lib 't/lib';
+use TestUtil;
 
 my %methods_for = (
     'Git::Database::Role::Backend'      => ['hash_object'],
