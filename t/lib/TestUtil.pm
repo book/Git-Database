@@ -78,6 +78,12 @@ my %builder_for = (
     'Git::Wrapper'    => sub { Git::Wrapper->new( shift ); },
     'Git::Raw::Repository' => sub { Git::Raw::Repository->open( shift ); },
 );
+my %min_version = (
+    map ( { ( $_ => 0 ) } keys %builder_for ),
+    'Git::Raw::Repository' => 0.74,
+    'Git::Repository'      => 1.300,
+    'Git::Sub'             => 0.163320,
+);
 
 sub store_for { return $builder_for{ $_[0] }->( $_[1] ); }
 
@@ -104,6 +110,7 @@ sub available_bundles {
 
 sub available_backends {
     return 'None',    # always available
+      grep $_->VERSION >= $min_version{$_},
       map eval { Module::Runtime::use_module($_) },
       grep !/^None$/,
       sort keys %builder_for;
