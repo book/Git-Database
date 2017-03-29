@@ -2,6 +2,10 @@ Revision history for Git-Database
 
 {{$NEXT}}
 
+0.009 2017-03-29 BOOK
+    - Ensure the test suite skips backends that do not match the minimum
+      version requirements (RT #120760, reported by SREZIC)
+
 0.008 2017-03-25 BOOK
     - New backend: Git::Raw::Repository (with help from SROMANOV and JACQUESG)
     - Make get_object_attributes accept any valid attributes combination
