@@ -149,7 +149,7 @@ Git::Database::Backend::Git::Wrapper - A Git::Database backend based on Git::Wra
 
 =head1 DESCRIPTION
 
-This backend reads and write data from a Git repository using the
+This backend reads and writes data from a Git repository using the
 L<Git::Wrapper> module.
 
 =head2 Git Database Roles

@@ -172,7 +172,7 @@ Git::Database::Backend::Git::Sub - A Git::Database backend based on Git::Sub
 
 =head1 DESCRIPTION
 
-This backend reads and write data from a Git repository using the
+This backend reads and writes data from a Git repository using the
 L<Git::Sub> Git wrapper.
 
 =head2 Git Database Roles
