@@ -57,6 +57,8 @@ the Git object database maintained by Git.
 Git::Database is actually a factory class: L</new> returns
 L<backend|Git::Database::Tutorial/backend> instances.
 
+Check L<Git::Database::Tutorial> for details.
+
 =head1 METHODS
 
 =head2 new
