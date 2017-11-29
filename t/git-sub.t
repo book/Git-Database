@@ -15,6 +15,7 @@ plan skip_all => 'Git::Sub not available'
 my %builder_for = (
     'string'         => sub { shift },
     'File::Fu'       => sub { File::Fu->dir(shift) },
+    'Mojo::File'     => sub { Mojo::File->new(shift) },
     'Path::Abstract' => sub { Path::Abstract->new(shift) },
     'Path::Class'    => sub { Path::Class::Dir->new(shift) },
     'Path::Tiny'     => sub { Path::Tiny->new(shift) },
