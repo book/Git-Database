@@ -6,6 +6,12 @@ use Git::Database;
 use lib 't/lib';
 use TestUtil;
 
+is_deeply(
+    [ sort None => Git::Database->available_stores ],
+    [ sort +available_backends() ],
+    'available_stores'
+);
+
 # a database with no store
 my $db = Git::Database->new();
 ok(

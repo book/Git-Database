@@ -8,6 +8,32 @@ use Module::Runtime qw( use_module );
 use Moo::Object ();
 use namespace::clean;
 
+# all known backend stores
+my @STORES = (
+    'Cogit',
+    'Git',
+    'Git::PurePerl',
+    'Git::Raw::Repository',
+    'Git::Repository',
+    'Git::Sub',
+    'Git::Wrapper',
+);
+
+my %MIN_VERSION = (
+    map ( +( $_ => 0 ), @STORES ),
+    'Git::Raw::Repository' => 0.74,
+    'Git::Repository'      => 1.300,
+    'Git::Sub'             => 0.163320,
+);
+
+# all installed backend stores
+my $STORES;
+
+sub available_stores {
+    $STORES ||= [ map eval { use_module( $_ => $MIN_VERSION{$_} ) }, @STORES ];
+    return @$STORES;
+}
+
 sub new {
     my $args = Moo::Object::BUILDARGS(@_);
 
@@ -70,6 +96,14 @@ Check L<Git::Database::Tutorial> for details.
 
 Return a L<backend|Git::Database::Tutorial/backend> object, based on
 the class of the L<store|Git::Database::Tutorial/store> object.
+
+=head2 available_stores
+
+    say for Git::Database->available_stores;
+
+This class methods returns the list of L<store|Git::Database::Tutorial/store>
+classes that are available (i.e. installed with a version matching the
+minimum version requirements).
 
 =head1 BACKEND METHODS
 
