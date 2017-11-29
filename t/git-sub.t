@@ -13,10 +13,11 @@ plan skip_all => 'Git::Sub not available'
   if !eval { require Git::Sub; };
 
 my %builder_for = (
-    'string'      => sub { shift },
-    'File::Fu'    => sub { File::Fu->dir(shift) },
-    'Path::Class' => sub { Path::Class::Dir->new(shift) },
-    'Path::Tiny'  => sub { Path::Tiny->new(shift) },
+    'string'         => sub { shift },
+    'File::Fu'       => sub { File::Fu->dir(shift) },
+    'Path::Abstract' => sub { Path::Abstract->new(shift) },
+    'Path::Class'    => sub { Path::Class::Dir->new(shift) },
+    'Path::Tiny'     => sub { Path::Tiny->new(shift) },
 );
 
 my @classes = ( 'string', grep eval { require_module($_) }, sort keys %builder_for );
