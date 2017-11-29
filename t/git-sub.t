@@ -23,6 +23,8 @@ my @classes = ( 'string', grep eval { require_module($_) }, sort keys %builder_f
 plan skip_all => "None of @{[ sort keys %builder_for ]} is installed"
   if !@classes;
 
+plan tests => @classes * 4;
+
 my $dir = repository_from('basic');
 
 for my $class (@classes) {
