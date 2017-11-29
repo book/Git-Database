@@ -12,12 +12,13 @@ plan skip_all => 'Git::Sub not available'
   if !eval { require Git::Sub; };
 
 my %builder_for = (
+    'string'      => sub { shift },
     'File::Fu'    => sub { File::Fu->dir(shift) },
     'Path::Class' => sub { Path::Class::Dir->new(shift) },
     'Path::Tiny'  => sub { Path::Tiny->new(shift) },
 );
 
-my @classes = grep eval { require_module($_) }, sort keys %builder_for;
+my @classes = ( 'string', grep eval { require_module($_) }, sort keys %builder_for );
 
 plan skip_all => "None of @{[ sort keys %builder_for ]} is installed"
   if !@classes;
@@ -34,7 +35,8 @@ for my $class (@classes) {
     isa_ok( $blob, 'Git::Database::Object::Blob' );
     is( $blob->content, 'hello', 'content is "hello"' );
 
-    isa_ok( $db->store, ref $obj, $obj );
+    if ( ref $obj ) { isa_ok( $db->store, ref $obj, $obj ); }
+    else            { is( ref $db->store, '', "'$obj' is a plain scalar" ); }
 }
 
 done_testing;
