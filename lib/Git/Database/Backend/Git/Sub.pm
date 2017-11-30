@@ -34,7 +34,8 @@ has '+store' => (
         my $dir = shift;
         return    # coerce to an absolute path
           File::Spec->file_name_is_absolute($dir) ? $dir
-          : ref $dir ? ref($dir)->new( File::Spec->rel2abs($dir) )
+          : ref $dir ? eval { ref($dir)->new( File::Spec->rel2abs($dir) ) }
+                         || File::Spec->rel2abs($dir)
           :            File::Spec->rel2abs($dir);
     },
 );
@@ -196,7 +197,9 @@ it will be coerced to an absolute path.
 Note that overloaded objects (such as L<Path::Tiny>, L<Path::Class> and
 others) that stringify to the actual path are supported. When coercion
 to an absolute path occurs, it attempts to create an object of the same
-class representing the absolute path.
+class representing the absolute path. If the coercion fails to create an
+object of the same class, the store attribute will be a string containing
+the absolute path.
 
 =head2 Git Database Roles
 
