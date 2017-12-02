@@ -20,7 +20,6 @@ my @STORES = (
 );
 
 my %MIN_VERSION = (
-    map ( +( $_ => 0 ), @STORES ),
     'Git::Raw::Repository' => 0.74,
     'Git::Repository'      => 1.300,
     'Git::Sub'             => 0.163320,
@@ -30,7 +29,7 @@ my %MIN_VERSION = (
 my $STORES;
 
 sub available_stores {
-    $STORES ||= [ map eval { use_module( $_ => $MIN_VERSION{$_} ) }, @STORES ];
+    $STORES ||= [ map eval { use_module( $_ => $MIN_VERSION{$_} || 0 ) }, @STORES ];
     return @$STORES;
 }
 
