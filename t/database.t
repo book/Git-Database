@@ -13,7 +13,7 @@ is_deeply(
 );
 
 # a database with no store
-my $db = Git::Database->new();
+my $db = Git::Database::Backend::None->new;
 ok(
     $db->does('Git::Database::Role::Backend'),
     'db does Git::Database::Role::Backend'
@@ -31,6 +31,12 @@ for my $backend ( available_backends() ) {
 
     # build backend from store
     $db = Git::Database->new( store => store_for( $backend, $dir ) );
+    isa_ok( $db, "Git::Database::Backend::$backend" );
+    isa_ok( $db->store, $backend )
+      if $backend ne 'None' && $backend ne 'Git::Sub';
+
+    # build backend from parts
+    $db = Git::Database->new( backend => $backend, work_tree => $dir );
     isa_ok( $db, "Git::Database::Backend::$backend" );
     isa_ok( $db->store, $backend )
       if $backend ne 'None' && $backend ne 'Git::Sub';
