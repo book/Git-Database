@@ -54,7 +54,7 @@ my %STORE_FOR = (
             ( directory => _absdir($_[0]->{work_tree}) )x!! $_[0]->{work_tree},
             ( gitdir    => _absdir($_[0]->{git_dir})   )x!! $_[0]->{git_dir},
         );
-        return Cogit->new( %args ? %args : ( directory => '.' ) );
+        return Cogit->new( %args ? %args : ( directory => _absdir('.') ) );
     },
     'Git' => sub {
         return Git->repository(
@@ -63,11 +63,10 @@ my %STORE_FOR = (
         );
      },
     'Git::PurePerl' => sub {
-        my %args = (
-            ( directory => _absdir("$_[0]->{work_tree}") )x!! $_[0]->{work_tree},
-            ( gitdir    => _absdir("$_[0]->{git_dir}")   )x!! $_[0]->{git_dir},
-        );
-        return Git::PurePerl->new( %args ? %args : ( directory => '.' ) );
+        my %args;
+        $args{directory} = _absdir("$_[0]->{work_tree}") if $_[0]->{work_tree};
+        $args{gitdir}    = _absdir("$_[0]->{git_dir}")   if $_[0]->{git_dir};
+        return Git::PurePerl->new( %args ? %args : ( directory => _absdir('.') ) );
     },
     'Git::Raw::Repository' => sub {
         return Git::Raw::Repository->open(
@@ -80,7 +79,7 @@ my %STORE_FOR = (
             ( git_dir   => $_[0]->{git_dir}   )x!! $_[0]->{git_dir},
         );
     },
-    'Git::Sub'     => sub { $_[0]->{work_tree} || $_[0]->{git_dir} ||() },
+    'Git::Sub'     => sub { $_[0]->{work_tree} || $_[0]->{git_dir} || _absdir('.') },
     'Git::Wrapper' => sub {
         return Git::Wrapper->new(
             { dir => _absdir( $_[0]->{work_tree} || $_[0]->{git_dir} || '.' ) }

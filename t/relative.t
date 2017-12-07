@@ -3,6 +3,7 @@ use warnings;
 use Test::More;
 use Module::Runtime qw( require_module );
 use File::pushd qw( pushd );
+use File::Spec;
 
 use Git::Database;
 
@@ -21,29 +22,33 @@ my %builder_for = (
     'Path::Tiny'     => sub { Path::Tiny->new(shift) },
 );
 
+my @backends = grep $_ ne 'None', available_backends();
+
 my @classes = ( 'string', grep eval { require_module($_) }, sort keys %builder_for );
 
 plan skip_all => "None of @{[ sort keys %builder_for ]} is installed"
   if !@classes;
 
-my @backends = grep $_ ne 'None', available_backends();
+my $dir   = repository_from('basic');
+my @tests = (
+    [$dir],
+    [ $dir, File::Spec->tmpdir ],
+    [ $dir, 't' ],
+    [ File::Spec->abs2rel($dir) ],
+    [ File::Spec->abs2rel($dir), File::Spec->tmpdir ],
+    [ File::Spec->abs2rel($dir), 't' ],
+);
 
-plan tests => @backends * @classes * 4 * 6;
-
-my $dir = repository_from('basic');
+sub test_blob {
+    my $db   = shift;
+    my $blob = $db->get_object('b6fc4c620b67d95f953a5c1c1230aaab5db5a1b0');
+    isa_ok( $blob, 'Git::Database::Object::Blob' );
+    is( eval { $blob->content }, 'hello', 'content is "hello"' );
+}
 
 for my $backend ( @backends ) {
 
     for my $class (@classes) {
-
-        my @tests = (
-            [$dir],
-            [ $dir, File::Spec->tmpdir ],
-            [ $dir, 't' ],
-            [ File::Spec->abs2rel($dir) ],
-            [ File::Spec->abs2rel($dir), File::Spec->tmpdir ],
-            [ File::Spec->abs2rel($dir), 't' ],
-        );
 
         for my $t (@tests) {
             my ( $path, $where ) = @$t;
@@ -63,16 +68,22 @@ for my $backend ( @backends ) {
             $where &&= pushd $where;
 
             # some minimal test
-            my $blob =
-              $db->get_object('b6fc4c620b67d95f953a5c1c1230aaab5db5a1b0');
-            isa_ok( $blob, 'Git::Database::Object::Blob' );
-            is( eval { $blob->content }, 'hello', 'content is "hello"' );
+            test_blob($db);
 
-          SKIP: {
-                skip "This test is only relevant for Git::Sub", 1
-                  if $backend ne 'Git::Sub';
+            if( $backend eq 'Git::Sub' ) {
                 if ( ref $obj ) { isa_ok( $db->store, ref $obj, $obj ); }
                 else { is( ref $db->store, '', "'$obj' is a plain scalar" ); }
+            }
+        }
+
+        # special case of 'current dir'
+        {
+            my $cwd = pushd $dir;
+            my $db = Git::Database->new( backend => $backend );
+            test_blob($db);
+            {
+                my $tmp = pushd( File::Spec->tmpdir );
+                test_blob($db);
             }
         }
     }
