@@ -195,7 +195,8 @@ L<store|Git::Database::Tutorial/store> object.
 
 If the C<store> parameter is missing, the backend class is selected
 according to the C<backend> parameter, or picked automatically among the
-L<available store classes|available_stores>. The actual store object
+L<available store classes|available_stores> (picking the fastest
+and more feature-complete among them). The actual store object
 is then instantiated using the C<work_tree> and C<git_dir> optional
 parameters. If none is given, the repository is assumed to be in the
 current directory.
