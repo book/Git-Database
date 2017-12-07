@@ -4,6 +4,16 @@ use strict;
 use warnings;
 
 use Module::Runtime qw( use_module );
+use File::Spec;
+
+sub _absdir {
+    my ($dir) = @_;
+    return    # coerce to an absolute path
+      File::Spec->file_name_is_absolute($dir) ? $dir
+      : ref $dir ? eval { ref($dir)->new( File::Spec->rel2abs($dir) ) }
+                     || File::Spec->rel2abs($dir)
+      :            File::Spec->rel2abs($dir);
+}
 
 use Moo::Object ();
 use namespace::clean;
@@ -41,21 +51,21 @@ sub available_stores {
 my %STORE_FOR = (
     'Cogit' => sub {
         my %args = (
-            ( directory => $_[0]->{work_tree} )x!! $_[0]->{work_tree},
-            ( gitdir    => $_[0]->{git_dir}   )x!! $_[0]->{git_dir},
+            ( directory => _absdir($_[0]->{work_tree}) )x!! $_[0]->{work_tree},
+            ( gitdir    => _absdir($_[0]->{git_dir})   )x!! $_[0]->{git_dir},
         );
         return Cogit->new( %args ? %args : ( directory => '.' ) );
     },
     'Git' => sub {
         return Git->repository(
-            ( WorkingCopy => $_[0]->{work_tree} )x!! $_[0]->{work_tree},
-            ( Repository  => $_[0]->{git_dir}   )x!! $_[0]->{git_dir},
+            ( WorkingCopy => _absdir($_[0]->{work_tree}) )x!! $_[0]->{work_tree},
+            ( Repository  => _absdir($_[0]->{git_dir})   )x!! $_[0]->{git_dir},
         );
      },
     'Git::PurePerl' => sub {
         my %args = (
-            ( directory => $_[0]->{work_tree} )x!! $_[0]->{work_tree},
-            ( gitdir    => $_[0]->{git_dir}   )x!! $_[0]->{git_dir},
+            ( directory => _absdir("$_[0]->{work_tree}") )x!! $_[0]->{work_tree},
+            ( gitdir    => _absdir("$_[0]->{git_dir}")   )x!! $_[0]->{git_dir},
         );
         return Git::PurePerl->new( %args ? %args : ( directory => '.' ) );
     },
@@ -73,7 +83,7 @@ my %STORE_FOR = (
     'Git::Sub'     => sub { $_[0]->{work_tree} || $_[0]->{git_dir} ||() },
     'Git::Wrapper' => sub {
         return Git::Wrapper->new(
-            { dir => $_[0]->{work_tree} || $_[0]->{git_dir} || '.' }
+            { dir => _absdir( $_[0]->{work_tree} || $_[0]->{git_dir} || '.' ) }
         );
     },
 );
