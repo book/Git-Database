@@ -330,7 +330,7 @@ Philippe Bruhat (BooK) <book@cpan.org>.
 
 =head1 COPYRIGHT
 
-Copyright 2013-2017 Philippe Bruhat (BooK), all rights reserved.
+Copyright 2013-2019 Philippe Bruhat (BooK), all rights reserved.
 
 =head1 LICENSE
 
