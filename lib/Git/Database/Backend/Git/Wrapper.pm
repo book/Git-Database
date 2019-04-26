@@ -175,7 +175,7 @@ and L<Git::Database::Role::RefWriter> roles.
 
 =head1 COPYRIGHT
 
-Copyright 2016-2017 Philippe Bruhat (BooK), all rights reserved.
+Copyright 2016-2019 Philippe Bruhat (BooK), all rights reserved.
 
 =head1 LICENSE
 
