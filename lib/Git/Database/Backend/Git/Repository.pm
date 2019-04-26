@@ -102,6 +102,9 @@ sub get_object_attributes {
     # object does not exist in the git object database
     return undef if $parts[-1] eq 'missing';
 
+    # git versions >= 2.21.0.rc0 explicitely say if a sha1 is ambiguous
+    return undef if $kind eq 'ambiguous';
+
     # read the whole content in memory at once
     my $res = read $out, (my $content), $size;
     if( $res != $size ) {

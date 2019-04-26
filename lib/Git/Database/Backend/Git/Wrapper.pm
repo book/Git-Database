@@ -60,6 +60,9 @@ sub get_object_attributes {
     # git versions >= 2.11.0.rc0 throw more verbose errors
     return undef if $parts[0] =~ /^(?:symlink|dangling|loop|notdir)$/;
 
+    # git versions >= 2.21.0.rc0 explicitely say if a sha1 is ambiguous
+    return undef if $kind eq 'ambiguous';
+
     # object does not exist in the git object database
     return undef if $parts[-1] eq 'missing';
 
